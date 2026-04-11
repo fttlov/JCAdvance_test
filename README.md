@@ -41,6 +41,9 @@
 --DSADvance.h--
 
 //@101    - _ButtonsState add Button ZL; Button ZR; 
+
 //@102    - _AppStatus add новые режимы
+
 //@103    - _CurrentXboxProfile int ZL int ZR
+
 //@104    - Двухкнопочный парсинг
