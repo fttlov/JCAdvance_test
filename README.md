@@ -42,4 +42,5 @@
 
 //@101    - _ButtonsState add Button ZL; Button ZR; 
 //@102    - _AppStatus add новые режимы
-//@103    - Двухкнопочный парсинг
+//@103    - _CurrentXboxProfile int ZL int ZR
+//@104    - Двухкнопочный парсинг
