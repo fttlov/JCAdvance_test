@@ -1,5 +1,6 @@
 Техническая инфа.
 Коды правок по порядку:
+--DSAdvance.cpp--
 
 //@001    - add Home/Capture in void LoadKMProfile
 
@@ -34,3 +35,11 @@
 //@016    - CAPTURE и HOME в KM
 
 //@017     -УНИВЕРСАЛЬНЫЙ БЛОК WHEEL Для Xbox и KM + Timer патч: Wheel плохо эмулировал (частые пропуски) кнопки Xbox при SleepTimeOut<15. Теперь SleepTimeOut=8 плавный Gyro и норм Wheel. При 66,67 реально видно как курсор мышки дрожит при пермещении, 125hz самое то.
+
+
+
+--DSADvance.h--
+
+//@101    - _ButtonsState add Button ZL; Button ZR; 
+//@102    - _AppStatus add новые режимы
+//@103    - Двухкнопочный парсинг
