@@ -28,6 +28,7 @@
 //@013    - Фикс чтоб на HOME эмулировались кнопки KM в XboxProfile
 
 //@014    - add EmuGamepadEnabled для эмуляции KM всех кнопок в XboxProfiles
+
 //@015    - Разделене BACK START в KM для SONY и N как в Xbox
 
 //@016    - CAPTURE и HOME в KM
