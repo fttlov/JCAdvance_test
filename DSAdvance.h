@@ -560,7 +560,7 @@ struct _CurrentXboxProfile {
 
 	unsigned int DSEdgeL4 = 0;
 	unsigned int DSEdgeR4 = 0;
-	unsigned int ZL = XINPUT_GAMEPAD_LEFT_TRIGGER;   // по умолчанию оставляем LT (совместимость)	@103
+	unsigned int ZL = XINPUT_GAMEPAD_LEFT_TRIGGER;   // по умолчанию оставляем LT (совместимость)	//@103
 	unsigned int ZR = XINPUT_GAMEPAD_RIGHT_TRIGGER;  // по умолчанию оставляем RT (совместимость)
 	unsigned int HOME = 0;   // Joy-Con HOME
 	unsigned int CAPTURE = 0;// Joy-Con Capture

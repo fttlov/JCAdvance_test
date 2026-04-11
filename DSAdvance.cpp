@@ -982,7 +982,7 @@ void LoadXboxProfile(std::string ProfileFile) {
 	CurrentXboxProfile.JCSL = XboxKeyNameToXboxKeyCode(IniFile.ReadString("JOYCONS", "SL", "NONE"));
 	CurrentXboxProfile.JCSR = XboxKeyNameToXboxKeyCode(IniFile.ReadString("JOYCONS", "SR", "NONE"));
 	CurrentXboxProfile.JCSR = XboxKeyNameToXboxKeyCode(IniFile.ReadString("JOYCONS", "SR", "NONE"));
-	CurrentXboxProfile.ZL = XboxKeyNameToXboxKeyCode(IniFile.ReadString("JOYCONS", "ZL", "LT"));	//@002 Триггеры не аналоговые, можго ремапить. Если закоментить в ini работают по старой схеме 
+	CurrentXboxProfile.ZL = XboxKeyNameToXboxKeyCode(IniFile.ReadString("JOYCONS", "ZL", "LT"));	//@002 Триггеры не аналоговые, можно ремапить. Если закоментить в ini работают по старой схеме 
 	CurrentXboxProfile.ZR = XboxKeyNameToXboxKeyCode(IniFile.ReadString("JOYCONS", "ZR", "RT"));
 	CurrentXboxProfile.HOME = XboxKeyNameToXboxKeyCode(IniFile.ReadString("JOYCONS", "HOME", "NONE"));	// Home Capture теперь биндятся
 	CurrentXboxProfile.CAPTURE = XboxKeyNameToXboxKeyCode(IniFile.ReadString("JOYCONS", "CAPTURE", "NONE"));
@@ -2937,7 +2937,7 @@ int main(int argc, char **argv)
 				KeyPress(PrimaryGamepad.ButtonsStates.JCSL.KeyCode, DontResetInputState && PrimaryGamepad.InputState.buttons & JSMASK_SL, &PrimaryGamepad.ButtonsStates.JCSL, true);
 				KeyPress(PrimaryGamepad.ButtonsStates.JCSR.KeyCode, DontResetInputState && PrimaryGamepad.InputState.buttons & JSMASK_SR, &PrimaryGamepad.ButtonsStates.JCSR, true);
 				KeyPress(PrimaryGamepad.ButtonsStates.HOME.KeyCode, DontResetInputState && PrimaryGamepad.InputState.buttons&JSMASK_HOME, &PrimaryGamepad.ButtonsStates.HOME, true);
-				KeyPress(PrimaryGamepad.ButtonsStates.CAPTURE.KeyCode, DontResetInputState&&PrimaryGamepad.InputState.buttons&JSMASK_CAPTURE, &PrimaryGamepad.ButtonsStates.CAPTURE, true); 			//@015
+				KeyPress(PrimaryGamepad.ButtonsStates.CAPTURE.KeyCode, DontResetInputState&&PrimaryGamepad.InputState.buttons&JSMASK_CAPTURE, &PrimaryGamepad.ButtonsStates.CAPTURE, true); 			//@016
 			}
 
 			// Motion wheel
@@ -3037,7 +3037,7 @@ int main(int argc, char **argv)
 				PrimaryGamepad.Motion.WheelAccumY += velocityY * AppStatus.FrameTime;
 			}*/
 
-			// УНИВЕРСАЛЬНЫЙ БЛОК WHEEL Для Xbox и KM + патч: Wheel плохо эмулировал кнопки Xbox при SleepTimeOut<15 	 //@016
+			// УНИВЕРСАЛЬНЫЙ БЛОК WHEEL Для Xbox и KM + патч: Wheel плохо эмулировал кнопки Xbox при SleepTimeOut<15 	 //@017
 			// теперь SleepTimeOut=8,  плавный Gyro и норм Wheel   
 			int currentWheelActivationBtn = (AppStatus.GamepadEmulationMode == EmuKeyboardAndMouse) ?
 				PrimaryGamepad.ButtonsStates.WheelActivationGamepadButton.KeyCode :
@@ -3146,7 +3146,7 @@ int main(int argc, char **argv)
 			}
 
 			// таймера удержания кнопки Xbox ---
-			if (PrimaryGamepad.Motion.WheelXboxHoldTimer > 0) {  if >0, идет процесс удержания кнопки.
+			if (PrimaryGamepad.Motion.WheelXboxHoldTimer > 0) {  //if >0, процесс удержания кнопки.
 				if (AppStatus.GamepadEmulationMode != EmuKeyboardAndMouse) {
 					report.wButtons |= PrimaryGamepad.Motion.WheelXboxHoldButton;  //добавляем нашу кнопку к уже нажатым
 				}
