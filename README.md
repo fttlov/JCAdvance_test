@@ -19,7 +19,7 @@
 
 //@009    - ZL ZR HOME CAPTURE биндятся в XpoxProfile
 
-//@010    - Сообщение о переносе блока Xbox Wheel в Универсальный блок Wheel для XBOX и KM, теперь он после старого блока Wheel в KM
+//@010    - Сообщение о переносе блока Xbox Wheel в Универсальный блок Wheel для XBOX и KM, теперь он где старый блок Wheel в KM
 
 //@011    - Driving Mode Hotkey двухкнопочный бинд 
 
