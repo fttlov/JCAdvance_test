@@ -15,9 +15,9 @@
 3. В KMProfiles добавлены CAPTURE HOME. Кнопки BACK(Minus) и START(Plus) отделены if/else от Sony, были намертво привзяаны к SHARE и OPTIONS не ясно зачем.
 
 4. Добавлены режимы и Hotkeys для них с поддержкой привязки двух кнопок аля X+Y в Config.ini (новый парсинг в .h)
--  DrivingToggleButton (on off) - был на Capture 
--  AimingToggleButton (on off) - был на HOME
--  AimingModeToggleButton (switch) - Был на R1+CAPTURE
+-  DrivingToggleButton (on off) - был жёстко на Capture 
+-  AimingToggleButton (on off) - был жёстко на HOME
+-  AimingModeToggleButton (switch) - был жёстко на R1+CAPTURE
 -  AimingByPressingMode (без Hotkey) - вместо двойного нажатия на HOME теперь 0 - MotionAimingMode, 1 - MotionAimingModeOnlyPressed
 
 5. Легкие правки в окне консоли из-за новых режимов, кнопки hotkey читаются из Config.ini и выводятся рядом с ALT + 1/2/A
