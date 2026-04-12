@@ -12,7 +12,7 @@
 
 2. В XboxProfile добавлена возможность эмулировать все кнопки из KMProfile, включая Wheel (об этом ниже). При переключении профилей вызывается нужная функция, хвостов от старого быть не должно
 
-3. В KMProfiles добавлены CAPTURE HOME. Кнопки BACK(Minus) и START(Plus) отделены if/else от Sony, были намертво привзяаны к SHARE и OPTIONS не ясно зачем.
+3. В KMProfiles добавлены CAPTURE HOME. BACK (Minus) и START (Plus) были намертво привзяаны к SHARE и OPTIONS не ясно зачем. Отделены if/else от Sony
 
 4. Добавлены режимы и Hotkeys для них с поддержкой привязки двух кнопок аля X+Y в Config.ini (новый парсинг в .h)
 -  DrivingToggleButton (on off) - был жёстко на Capture 
