@@ -1717,6 +1717,9 @@ int main(int argc, char **argv)
 	PrimaryGamepad.Motion.JoySensY = IniFile.ReadFloat("Motion", "JoySensY", 90) * 0.0025f;  // Calibration with Crysis 2, old 0.0013;
 	PrimaryGamepad.Motion.JoySensAvg = (PrimaryGamepad.Motion.JoySensX + PrimaryGamepad.Motion.JoySensY) * 0.5f; // Sens Average
 	PrimaryGamepad.Motion.MotionWheelButtonsDeadZone = IniFile.ReadFloat("Motion", "MotionWheelButtonsDeadZone", 12.0f);
+	PrimaryGamepad.Motion.MouseSmooth = ClampFloat(IniFile.ReadFloat("Motion", "MouseSmooth", 0), 0, 99) * 0.01f; //@029 EMA
+	PrimaryGamepad.Motion.JoySmooth = ClampFloat(IniFile.ReadFloat("Motion", "JoySmooth", 0), 0, 99) * 0.01f;
+	PrimaryGamepad.Motion.Tightening = IniFile.ReadFloat("Motion", "Tightening", 2.0f); //@030
 
 	PrimaryGamepad.DefaultModeColor = WebColorToRGB(IniFile.ReadString("Gamepad", "DefaultModeColor", "0000ff"));
 	PrimaryGamepad.OutState.LEDColor = PrimaryGamepad.DefaultModeColor;
@@ -1829,6 +1832,7 @@ int main(int argc, char **argv)
 	RefreshDevices();
 
 	MOTION_STATE MotionState;
+	IMU_STATE ImuState;	//@028 
 	TOUCH_STATE TouchState;
 
 	const auto client = vigem_alloc();
@@ -1903,22 +1907,25 @@ int main(int argc, char **argv)
 		if (PrimaryGamepad.DeviceIndex2 == -1) {
 			PrimaryGamepad.InputState = JslGetSimpleState(PrimaryGamepad.DeviceIndex);
 			MotionState = JslGetMotionState(PrimaryGamepad.DeviceIndex);
+			ImuState = JslGetIMUState(PrimaryGamepad.DeviceIndex); //@028
 			JslGetAndFlushAccumulatedGyro(PrimaryGamepad.DeviceIndex, velocityX, velocityY, velocityZ);
 		}
 		else { // Split contoller (Joycons)
 			PrimaryGamepad.InputState = JslGetSimpleState(PrimaryGamepad.DeviceIndex);
 			JOY_SHOCK_STATE tempState = JslGetSimpleState(PrimaryGamepad.DeviceIndex2);
-			/*MotionState = JslGetMotionState(PrimaryGamepad.DeviceIndex2);
-			PrimaryGamepad.InputState.stickRX = tempState.stickRX;
-			PrimaryGamepad.InputState.stickRY = tempState.stickRY;
-			PrimaryGamepad.InputState.rTrigger = tempState.rTrigger;
-			JslGetAndFlushAccumulatedGyro(PrimaryGamepad.DeviceIndex2, velocityX, velocityY, velocityZ);
-			PrimaryGamepad.InputState.buttons |= tempState.buttons;*/
+			//MotionState = JslGetMotionState(PrimaryGamepad.DeviceIndex2);
+			//PrimaryGamepad.InputState.stickRX = tempState.stickRX;
+			//PrimaryGamepad.InputState.stickRY = tempState.stickRY;
+			//PrimaryGamepad.InputState.rTrigger = tempState.rTrigger;
+			//JslGetAndFlushAccumulatedGyro(PrimaryGamepad.DeviceIndex2, velocityX, velocityY, velocityZ);
+			//PrimaryGamepad.InputState.buttons |= tempState.buttons;
 			if (AppStatus.GyroFromLeft) {		//@024 gyro левша
 				MotionState = JslGetMotionState(PrimaryGamepad.DeviceIndex);
+				ImuState = JslGetIMUState(PrimaryGamepad.DeviceIndex);	//@028
 				JslGetAndFlushAccumulatedGyro(PrimaryGamepad.DeviceIndex, velocityX, velocityY, velocityZ);
 			} else {
 				MotionState = JslGetMotionState(PrimaryGamepad.DeviceIndex2);
+				ImuState = JslGetIMUState(PrimaryGamepad.DeviceIndex2);
 				JslGetAndFlushAccumulatedGyro(PrimaryGamepad.DeviceIndex2, velocityX, velocityY, velocityZ);
 			}
 			PrimaryGamepad.InputState.stickRX = tempState.stickRX;
@@ -2783,8 +2790,8 @@ int main(int argc, char **argv)
 			else {
 				const float InputSize = sqrtf(velocityX * velocityX + velocityY * velocityY + velocityZ * velocityZ);
 				float TightenedSensitivity = PrimaryGamepad.Motion.AircraftRollSens;
-				if (InputSize < Tightening && Tightening > 0)
-					TightenedSensitivity *= InputSize / Tightening;
+				if (InputSize < PrimaryGamepad.Motion.Tightening && PrimaryGamepad.Motion.Tightening > 0)
+					TightenedSensitivity *= InputSize / PrimaryGamepad.Motion.Tightening;	//030
 
 				report.sThumbLX = std::clamp((int)(ClampFloat(-(velocityY * TightenedSensitivity * AppStatus.FrameTime * PrimaryGamepad.Motion.JoySensX * PrimaryGamepad.Motion.CustomMulSens), -1, 1) * 32767 + report.sThumbLX), -32767, 32767);
 				report.sThumbLY = (SHORT)(CalcMotionStick(MotionState.gravY, MotionState.gravZ, PrimaryGamepad.Motion.AircraftPitchAngle, PrimaryGamepad.Motion.OffsetAxisY) * 32767) * PrimaryGamepad.Motion.AircraftPitchInverted;
@@ -2804,7 +2811,7 @@ int main(int argc, char **argv)
 				//lastTime = currentTime;
 
 				// Snippet by JibbSmart https://gist.github.com/JibbSmart/8cbaba568c1c2e1193771459aa5385df
-				const float InputSize = sqrtf(velocityX * velocityX + velocityY * velocityY + velocityZ * velocityZ);
+				/*const float InputSize = sqrtf(velocityX * velocityX + velocityY * velocityY + velocityZ * velocityZ);
 
 				float TightenedSensitivity = AppStatus.AimMode == AimMouseMode ? PrimaryGamepad.Motion.SensAvg * PrimaryGamepad.Motion.CustomMulSens * 50.f : PrimaryGamepad.Motion.JoySensAvg * PrimaryGamepad.Motion.CustomMulSens * 50.f;
 
@@ -2817,6 +2824,52 @@ int main(int argc, char **argv)
 				} else { // Mouse-Joystick
 					report.sThumbRX = std::clamp((int)(ClampFloat(-(velocityY * TightenedSensitivity * AppStatus.FrameTime * PrimaryGamepad.Motion.JoySensX * PrimaryGamepad.Motion.CustomMulSens), -1, 1) * 32767 + report.sThumbRX), -32767, 32767);
 					report.sThumbRY = std::clamp((int)(ClampFloat(velocityX * TightenedSensitivity * AppStatus.FrameTime * PrimaryGamepad.Motion.JoySensY * PrimaryGamepad.Motion.CustomMulSens, -1, 1) * 32767 + report.sThumbRY), -32767, 32767);
+				}*/
+				
+				//@028 Выбираем источник данных: для Мыши нужны дельты (со сбросом), для Стика - постоянная скорость
+				float effGyroX = velocityX;
+				float effGyroY = velocityY;
+				float effGyroZ = velocityZ;
+
+				if (AppStatus.AimMode != AimMouseMode) {
+					effGyroX = ImuState.gyroX;
+					effGyroY = ImuState.gyroY;
+					effGyroZ = ImuState.gyroZ;
+				}
+
+				//@029 EMA (Alpha / (1 - Alpha)) * SleepTimout
+				float smoothAlpha = (AppStatus.AimMode == AimMouseMode) ? PrimaryGamepad.Motion.MouseSmooth : PrimaryGamepad.Motion.JoySmooth;
+
+				if (smoothAlpha > 0.0f) {
+					PrimaryGamepad.Motion.EmaGyroX = effGyroX * (1.0f - smoothAlpha) + PrimaryGamepad.Motion.EmaGyroX * smoothAlpha;
+					PrimaryGamepad.Motion.EmaGyroY = effGyroY * (1.0f - smoothAlpha) + PrimaryGamepad.Motion.EmaGyroY * smoothAlpha;
+					PrimaryGamepad.Motion.EmaGyroZ = effGyroZ * (1.0f - smoothAlpha) + PrimaryGamepad.Motion.EmaGyroZ * smoothAlpha;
+
+					effGyroX = PrimaryGamepad.Motion.EmaGyroX;
+					effGyroY = PrimaryGamepad.Motion.EmaGyroY;
+					effGyroZ = PrimaryGamepad.Motion.EmaGyroZ;
+				}
+				else {
+					PrimaryGamepad.Motion.EmaGyroX = effGyroX;
+					PrimaryGamepad.Motion.EmaGyroY = effGyroY;
+					PrimaryGamepad.Motion.EmaGyroZ = effGyroZ;//end EMA
+				}
+
+				const float InputSize = sqrtf(effGyroX * effGyroX + effGyroY * effGyroY + effGyroZ * effGyroZ);
+
+				float TightenedSensitivity = AppStatus.AimMode == AimMouseMode ? PrimaryGamepad.Motion.SensAvg * PrimaryGamepad.Motion.CustomMulSens * 50.f : PrimaryGamepad.Motion.JoySensAvg * PrimaryGamepad.Motion.CustomMulSens * 50.f;
+
+				// Используем переменную Tightening из конфига
+				if (InputSize < PrimaryGamepad.Motion.Tightening && PrimaryGamepad.Motion.Tightening > 0)
+					TightenedSensitivity *= InputSize / PrimaryGamepad.Motion.Tightening;
+
+				if (AppStatus.AimMode == AimMouseMode) {
+					MouseMove(-effGyroY * TightenedSensitivity * AppStatus.FrameTime * PrimaryGamepad.Motion.SensX * PrimaryGamepad.Motion.CustomMulSens, -effGyroX * TightenedSensitivity * AppStatus.FrameTime * PrimaryGamepad.Motion.SensY * PrimaryGamepad.Motion.CustomMulSens);
+
+				}
+				else { // Mouse-Joystick
+					report.sThumbRX = std::clamp((int)(ClampFloat(-(effGyroY * TightenedSensitivity * AppStatus.FrameTime * PrimaryGamepad.Motion.JoySensX * PrimaryGamepad.Motion.CustomMulSens), -1, 1) * 32767 + report.sThumbRX), -32767, 32767);
+					report.sThumbRY = std::clamp((int)(ClampFloat(effGyroX * TightenedSensitivity * AppStatus.FrameTime * PrimaryGamepad.Motion.JoySensY * PrimaryGamepad.Motion.CustomMulSens, -1, 1) * 32767 + report.sThumbRY), -32767, 32767);
 				}
 
 		}

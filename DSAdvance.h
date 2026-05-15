@@ -147,7 +147,7 @@
 
 // Aiming
 //#define FrameTime						0.0166666666666667f // 1.f / 60.f
-#define Tightening						2.f
+//#define Tightening						2.f
 
 // Mic LED status
 #define MIC_LED_ON						0x01
@@ -374,6 +374,12 @@ struct AdvancedGamepad {
 		int AircraftPitchInverted = 0;
 		float AircraftRollSens = 0;
 		float CustomMulSens = 1.0f;
+		float MouseSmooth = 0.0f;	//@111 EMA Filter
+		float JoySmooth = 0.0f;
+		float EmaGyroX = 0.0f;
+		float EmaGyroY = 0.0f;
+		float EmaGyroZ = 0.0f;
+		float Tightening = 2.0f; // Значение по умолчанию
 
 		float MotionWheelButtonsDeadZone = 0;
 		int WheelCounter = 0;
