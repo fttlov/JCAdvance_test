@@ -381,7 +381,7 @@ struct AdvancedGamepad {
 		float WheelAccumX = 0;
 		float WheelAccumY = 0;
 		int WheelXboxHoldTimer = 0;		//@105
-		WORD WheelXboxHoldButton = 0; 
+		WORD WheelXboxHoldButton = 0;
 	};
 	_Motion Motion;
 

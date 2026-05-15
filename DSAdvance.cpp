@@ -1077,7 +1077,7 @@ void DefaultMainText() {
 			printf("\033[32m Nintendo Joy-Con(s) -\033[0m");
 			if (PrimaryGamepad.HidHandle != NULL && PrimaryGamepad.HidHandle2 != NULL) printf("\033[32m left & right\033[0m");
 			else if (PrimaryGamepad.HidHandle != NULL) printf("\033[32m left\033[0m");
-			else if (PrimaryGamepad.HidHandle2 != NULL) printf("\033[32m right\033[0m");	//@026 Не работает почему-то блять! Починить тут и в layer3
+			else if (PrimaryGamepad.HidHandle2 != NULL) printf("\033[32m right\033[0m");
 			//printf(") (\033[32m all functions)\033[0m");
 			break;
 		case NINTENDO_SWITCH_PRO:
@@ -1145,8 +1145,9 @@ void DefaultMainText() {
 		printf("\n \033[4mDescription\033[0m:");
 		printf("\n JCAdvance is an Xbox gamepad emulator with advanced Gyro features. You can map most of any button on your \n" 
 		" gamepad to emulate any of Xbox, Keyboard or Mouse keys. Gyro modes are controlled in real time using hotkeys.\n" 
-		" Map buttons in XboxProfiles\\Default.ini. Map Hotkeys and setup other options in Config.ini.\n");
-		printf("\n \033[4mModes & Hotkeys\033[0m:");
+		" Map buttons in XboxProfiles\\Default.ini. Map hotkeys and setup other options in Config.ini.\n");
+		
+		printf("\n \033[4mGyro info\033[0m:");
 
 		printf("\n Press \"\033[1m%s\033[0m\" or \"\033[1mALT + 2\033[0m\" to activate Gyro Aiming Mode (on/off)\n", AppStatus.AimingToggleButtonName.c_str());
 
@@ -1161,6 +1162,8 @@ void DefaultMainText() {
 		printf("\n Set Gyro move behavior in the Config.ini (1 = by pressing AimButton, 0 = always on)\n");
 
 		printf("\n Press \"\033[1m%s\033[0m\" or \"\033[1mALT + 1\033[0m\" to activate Driving Mode (on/off)\n", AppStatus.DrivingToggleButtonName.c_str());
+
+		printf("\n \033[4mMiscellaneous\033[0m:");
 
 		printf("\n Press \"\033[1mALT + I\033[0m\" or the center of the touchpad (Sony only) to view battery status\n");
 
@@ -1412,35 +1415,51 @@ void OpenGamepadByJSL(AdvancedGamepad &Gamepad) {	//@021 RumbleFix3 -возмо�
 	struct hid_device_info *cur_dev = devs;
 
 	while (cur_dev) {
-		// Если путь совпал с левым (или основным) джойконом из JSL
-		if (path1 == cur_dev->path && Gamepad.HidHandle == NULL) {
-			Gamepad.HidHandle = hid_open(cur_dev->vendor_id, cur_dev->product_id, cur_dev->serial_number);
-			Gamepad.DevicePath = cur_dev->path;
-			if (Gamepad.HidHandle) {
-				hid_set_nonblocking(Gamepad.HidHandle, 1);
-				// Настраиваем тип устройства и проверяем Bluetooth
-				if (type == JS_TYPE_DS) {
-					Gamepad.ControllerType = SONY_DUALSENSE;
-					Gamepad.USBConnection = true;
-					unsigned char buf[64] = {0};
-					hid_read_timeout(Gamepad.HidHandle, buf, 64, 100);
-					if (buf[0] == 0x31) Gamepad.USBConnection = false;
-				} else if (type == JS_TYPE_DS4) {
-					Gamepad.ControllerType = SONY_DUALSHOCK4;
-					Gamepad.USBConnection = true;
-					unsigned char checkBT[2] = {0x02, 0x00};
-					hid_write(Gamepad.HidHandle, checkBT, sizeof(checkBT));
-					unsigned char buf[64] = {0};
-					int bytesRead = hid_read_timeout(Gamepad.HidHandle, buf, sizeof(buf), 100);
-					if (bytesRead > 0 && buf[0] == 0x11) Gamepad.USBConnection = false;
-				} else if (type == JS_TYPE_PRO_CONTROLLER) {
-					Gamepad.ControllerType = NINTENDO_SWITCH_PRO;
-					Gamepad.RumbleSkipCounter = 300;
-					unsigned char buf[64] = {0x80, 0x01};
-					Gamepad.USBConnection = (hid_write(Gamepad.HidHandle, buf, 2) > 0);
-				} else if (type == JS_TYPE_JOYCON_LEFT || type == JS_TYPE_JOYCON_RIGHT) {
-					Gamepad.ControllerType = NINTENDO_JOYCONS;
-					Gamepad.USBConnection = false;
+		// Если путь совпал с первым устройством из JSL
+		if (path1 == cur_dev->path) {
+			if (type == JS_TYPE_JOYCON_RIGHT) {	//@027 ritght всегда в HidHandle2
+				if (Gamepad.HidHandle2 == NULL) {
+					Gamepad.HidHandle2 = hid_open(cur_dev->vendor_id, cur_dev->product_id, cur_dev->serial_number);
+					Gamepad.DevicePath2 = cur_dev->path;
+					if (Gamepad.HidHandle2) {
+						hid_set_nonblocking(Gamepad.HidHandle2, 1);
+						Gamepad.ControllerType = NINTENDO_JOYCONS;
+						Gamepad.USBConnection = false;
+					}
+				}
+			}
+			else if (Gamepad.HidHandle == NULL) {
+				Gamepad.HidHandle = hid_open(cur_dev->vendor_id, cur_dev->product_id, cur_dev->serial_number);
+				Gamepad.DevicePath = cur_dev->path;
+				if (Gamepad.HidHandle) {
+					hid_set_nonblocking(Gamepad.HidHandle, 1);
+					// Настраиваем тип устройства и проверяем Bluetooth
+					if (type == JS_TYPE_DS) {
+						Gamepad.ControllerType = SONY_DUALSENSE;
+						Gamepad.USBConnection = true;
+						unsigned char buf[64] = { 0 };
+						hid_read_timeout(Gamepad.HidHandle, buf, 64, 100);
+						if (buf[0] == 0x31) Gamepad.USBConnection = false;
+					}
+					else if (type == JS_TYPE_DS4) {
+						Gamepad.ControllerType = SONY_DUALSHOCK4;
+						Gamepad.USBConnection = true;
+						unsigned char checkBT[2] = { 0x02, 0x00 };
+						hid_write(Gamepad.HidHandle, checkBT, sizeof(checkBT));
+						unsigned char buf[64] = { 0 };
+						int bytesRead = hid_read_timeout(Gamepad.HidHandle, buf, sizeof(buf), 100);
+						if (bytesRead > 0 && buf[0] == 0x11) Gamepad.USBConnection = false;
+					}
+					else if (type == JS_TYPE_PRO_CONTROLLER) {
+						Gamepad.ControllerType = NINTENDO_SWITCH_PRO;
+						Gamepad.RumbleSkipCounter = 300;
+						unsigned char buf[64] = { 0x80, 0x01 };
+						Gamepad.USBConnection = (hid_write(Gamepad.HidHandle, buf, 2) > 0);
+					}
+					else if (type == JS_TYPE_JOYCON_LEFT) {
+						Gamepad.ControllerType = NINTENDO_JOYCONS;
+						Gamepad.USBConnection = false;
+					}
 				}
 			}
 			// Если путь совпал с правым джойконом из JSL
@@ -2606,10 +2625,10 @@ int main(int argc, char **argv)
 			report.wButtons = (WORD)XboxButtons;
 		}
 		// Nintendo controllers buttons: Capture & Home - changing working mode + another controllers (with additional buttons with keyboard emulation)
-		if ((IsKeyPressed(VK_MENU) && IsKeyPressed('1')) || (IsKeyPressed(VK_MENU) && IsKeyPressed('2')) ||		//@027 -Добавить Hotkey для всех
-			JslGetControllerType(PrimaryGamepad.DeviceIndex) == JS_TYPE_PRO_CONTROLLER ||
-			JslGetControllerType(PrimaryGamepad.DeviceIndex) == JS_TYPE_JOYCON_LEFT ||
-			JslGetControllerType(PrimaryGamepad.DeviceIndex) == JS_TYPE_JOYCON_RIGHT) {
+		//if ((IsKeyPressed(VK_MENU) && IsKeyPressed('1')) || (IsKeyPressed(VK_MENU) && IsKeyPressed('2')) ||		//@027 -Добавить Hotkey для всех
+			//JslGetControllerType(PrimaryGamepad.DeviceIndex) == JS_TYPE_PRO_CONTROLLER ||
+			//JslGetControllerType(PrimaryGamepad.DeviceIndex) == JS_TYPE_JOYCON_LEFT ||
+			//JslGetControllerType(PrimaryGamepad.DeviceIndex) == JS_TYPE_JOYCON_RIGHT) {
 
 			//Driving Mode Hotkey двухкнопочный бинд новый парсинг	//@011
 			if (AppStatus.SkipPollCount == 0 && ((AppStatus.DrivingToggleButton != 0 && (PrimaryGamepad.InputState.buttons & AppStatus.DrivingToggleButton) == AppStatus.DrivingToggleButton && AppStatus.JoyconChangeModesWithButton == 0) || (IsKeyPressed(VK_MENU) && IsKeyPressed('1')))) {
@@ -2674,7 +2693,7 @@ int main(int argc, char **argv)
 			}*/
 
 			// Sony
-		} else {
+		if (JslGetControllerType(PrimaryGamepad.DeviceIndex) == JS_TYPE_DS || JslGetControllerType(PrimaryGamepad.DeviceIndex) == JS_TYPE_DS4) {
 			// GameBar & multi keys
 			// PS without any keys
 			if (PrimaryGamepad.PSReleasedCount == 0 && PrimaryGamepad.InputState.buttons == JSMASK_PS) { PrimaryGamepad.PSOnlyCheckCount = AppStatus.ButtonCheckTimeOut; PrimaryGamepad.PSOnlyPressed = true; }
@@ -2799,8 +2818,9 @@ int main(int argc, char **argv)
 					report.sThumbRX = std::clamp((int)(ClampFloat(-(velocityY * TightenedSensitivity * AppStatus.FrameTime * PrimaryGamepad.Motion.JoySensX * PrimaryGamepad.Motion.CustomMulSens), -1, 1) * 32767 + report.sThumbRX), -32767, 32767);
 					report.sThumbRY = std::clamp((int)(ClampFloat(velocityX * TightenedSensitivity * AppStatus.FrameTime * PrimaryGamepad.Motion.JoySensY * PrimaryGamepad.Motion.CustomMulSens, -1, 1) * 32767 + report.sThumbRY), -32767, 32767);
 				}
-			
+
 		}
+
 		// [-_-] Touchpad sticks
 		else if (PrimaryGamepad.GamepadActionMode == TouchpadSticksMode) {
 
