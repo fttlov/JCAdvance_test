@@ -53,6 +53,8 @@ P.P.S. Всё ещё поражаюсь потреблению ресурсов 
 Коды правок по порядку:
 --DSAdvance.cpp--
 
+Release 0.1
+
 //@001    - add Home/Capture in void LoadKMProfile
 
 //@002    - Триггеры JoyCon в void LoadXboxProfile, теперь можно ремапить. Если закоментить в ini работают по старой схеме 
@@ -87,6 +89,8 @@ P.P.S. Всё ещё поражаюсь потреблению ресурсов 
 
 //@017     - УНИВЕРСАЛЬНЫЙ БЛОК WHEEL Для Xbox и KM + Timer патч
 
+Release 0.2
+
 //@018      - второй joy-con в batteryupdate
 
 //@019      - RumbleFix1
@@ -114,6 +118,7 @@ P.P.S. Всё ещё поражаюсь потреблению ресурсов 
 //@030      - Tightening вывден в конфиг, шобы було. Подкорректирован блок Aircraft
 
 
+
 --DSADvance.h--
 
 //@101    - _ButtonsState add Button ZL; Button ZR; 
@@ -125,6 +130,8 @@ P.P.S. Всё ещё поражаюсь потреблению ресурсов 
 //@104    - Двухкнопочный парсинг
 
 //@105      - WheelXboxHoldTimer
+
+Release 0.2
 
 //@106      - Отдельный счетчик для правого джойкона (HidHandle2)
 
