@@ -1,0 +1,297 @@
+<h2 id="creating-a-profile">Creating a Profile</h2>
+<p>Open the folder <code>DSAdvance\XboxProfiles</code>, make a copy <code>Default.ini</code> file, rename it and insert the necessary buttons for pressing.</p>
+
+<h2 id="General XboxProfile button names">General XboxProfile button names</h2>
+<p>Sony/Nintendo button names 
+to JCAdvance unified Keycodes Table.</p>
+
+<table border="1">
+<thead>
+<tr>
+<th>Sony</th>
+<th>Nintendo</th>
+<th>Keycode</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>None</td>
+<td>None</td>
+<td><code>NONE</code></td>
+</tr>
+<tr>
+<td>L1</td>
+<td>L</td>
+<td><code>LB</code></td>
+</tr>
+<tr>
+<td>R1</td>
+<td>R</td>
+<td><code>RB</code></td>
+</tr>
+<tr>
+<td>L2</td>
+<td>ZL</td>
+<td><code>LT</code></td>
+</tr>
+<tr>
+<td>R2</td>
+<td>ZR</td>
+<td><code>RT</code></td>
+</tr>
+<tr>
+<td>L3 (Stick)</td>
+<td>L3 (Stick)</td>
+<td><code>LS</code></td>
+</tr>
+<tr>
+<td>R3 (Stick)</td>
+<td>R3 (Stick)</td>
+<td><code>RS</code></td>
+</tr>
+<tr>
+<td>D-Pad Up</td>
+<td>D-Pad Up</td>
+<td><code>UP</code></td>
+</tr>
+<tr>
+<td>D-Pad Down</td>
+<td>D-Pad Down</td>
+<td><code>DOWN</code></td>
+</tr>
+<tr>
+<td>D-Pad Left</td>
+<td>D-Pad Left</td>
+<td><code>LEFT</code></td>
+</tr>
+<tr>
+<td>D-Pad Right</td>
+<td>D-Pad Right</td>
+<td><code>RIGHT</code></td>
+</tr>
+<tr>
+<td>&#9650; (Triangle)</td>
+<td>X</td>
+<td><code>Y</code></td>
+</tr>
+<tr>
+<td>&#9634; (Square)</td>
+<td>Y</td>
+<td><code>X</code></td>
+</tr>
+<tr>
+<td>O (Circle)</td>
+<td>A</td>
+<td><code>B</code></td>
+</tr>
+<tr>
+<td>X (Cross)</td>
+<td>B</td>
+<td><code>A</code></td>
+</tr>
+<tr>
+<td>Share / Back</td>
+<td>Minus</td>
+<td><code>BACK</code></td>
+</tr>
+<tr>
+<td>Options / Menu</td>
+<td>Plus</td>
+<td><code>START</code></td>
+</tr>
+</tbody>
+</table>
+
+<h3 id="additional-buttons">Additional Buttons</h3>
+<p>Some controllers have an extra buttons. Sony DualSense Edge: <code>L4</code>, <code>R4</code>; Joy-con: <code>SL</code>, <code>SR</code>, <code>CAPTURE</code>, <code>HOME</code>. Also Nintendo controllers allow to remap the triggers: ZL ZR (cause it's a digital buttons). All they can be mapped in the respective <code>[DUALSENSE-EDGE]</code> and <code>[JOYCONS]</code> sections in *.ini profile using the keycodes</p>
+<h3 id="*">*</h3>
+<p>Remember about mismatching A B X Y positions on Xbox and other gamepads</p>
+<h3 id="**">**</h3>
+<p>All buttons must be in his respective sections [XBOX], [JOYCONS],  [KEYBOARD-MOUSE] etc.</p>
+
+<h1 id="Button names for Config.ini">Button names for Config.ini</h1>
+<p>All Sony/Nintendo buttons for mapiing Hotkeys in Config.ini</p>
+
+<table border="1">
+<thead>
+<tr>
+<th>Gamepad</th>
+<th>Official Name</th>
+<th>KeyCode</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Any</td>
+<td>DPAD Up</td>
+<td><code>UP</code></td>
+</tr>
+<tr>
+<td>Any</td>
+<td>DPAD Down</td>
+<td><code>DOWN</code></td>
+</tr>
+<tr>
+<td>Any</td>
+<td>DPAD Left</td>
+<td><code>LEFT</code></td>
+</tr>
+<tr>
+<td>Any</td>
+<td>DPAD Right</td>
+<td><code>RIGHT</code></td>
+</tr>
+<tr>
+<td>Any</td>
+<td>Left Stick Press</td>
+<td><code>L3</code></td>
+</tr>
+<tr>
+<td>Any</td>
+<td>Right Stick Press</td>
+<td><code>R3</code></td>
+</tr>
+<!-- Nintendo Section -->
+<tr>
+<td>Nintendo</td>
+<td>L</td>
+<td><code>L</code></td>
+</tr>
+<tr>
+<td>Nintendo</td>
+<td>R</td>
+<td><code>R</code></td>
+</tr>
+<tr>
+<td>Nintendo</td>
+<td>ZL</td>
+<td><code>ZL</code></td>
+</tr>
+<tr>
+<td>Nintendo</td>
+<td>ZR</td>
+<td><code>ZR</code></td>
+</tr>
+<tr>
+<td>Nintendo</td>
+<td>B</td>
+<td><code>B</code></td>
+</tr>
+<tr>
+<td>Nintendo</td>
+<td>A</td>
+<td><code>A</code></td>
+</tr>
+<tr>
+<td>Nintendo</td>
+<td>Y</td>
+<td><code>Y</code></td>
+</tr>
+<tr>
+<td>Nintendo</td>
+<td>X</td>
+<td><code>X</code></td>
+</tr>
+<tr>
+<td>Nintendo</td>
+<td>Minus</td>
+<td><code>MINUS</code></td>
+</tr>
+<tr>
+<td>Nintendo</td>
+<td>Plus</td>
+<td><code>PLUS</code></td>
+</tr>
+<tr>
+<td>Nintendo Joy-Con</td>
+<td>SL (Edge button)</td>
+<td><code>SL</code></td>
+</tr>
+<tr>
+<td>Nintendo Joy-Con</td>
+<td>SR (Edge button)</td>
+<td><code>SR</code></td>
+</tr>
+<tr>
+<td>Nintendo</td>
+<td>Home</td>
+<td><code>HOME</code></td>
+</tr>
+<tr>
+<td>Nintendo</td>
+<td>Capture</td>
+<td><code>CAPTURE</code></td>
+</tr>
+<!-- Sony Section -->
+<tr>
+<td>Sony</td>
+<td>L1</td>
+<td><code>L1</code></td>
+</tr>
+<tr>
+<td>Sony</td>
+<td>R1</td>
+<td><code>R1</code></td>
+</tr>
+<tr>
+<td>Sony</td>
+<td>L2</td>
+<td><code>L2</code></td>
+</tr>
+<tr>
+<td>Sony</td>
+<td>X (Cross)</td>
+<td><code>CROSS</code></td>
+</tr>
+<tr>
+<td>Sony</td>
+<td>O (Circle)</td>
+<td><code>CIRCLE</code></td>
+</tr>
+<tr>
+<td>Sony</td>
+<td>&#9634; (Square)</td>
+<td><code>SQUARE</code></td>
+</tr>
+<tr>
+<td>Sony</td>
+<td>&#9650; (Triangle)</td>
+<td><code>TRIANGLE</code></td>
+</tr>
+<tr>
+<td>Sony</td>
+<td>Share / Back</td>
+<td><code>SHARE</code></td>
+</tr>
+<tr>
+<td>Sony</td>
+<td>Options / Menu</td>
+<td><code>OPTIONS</code></td>
+</tr>
+<tr>
+<td>Sony DualSense Edge</td>
+<td>Rear Left Button</td>
+<td><code>L4</code></td>
+</tr>
+<tr>
+<td>Sony DualSense Edge</td>
+<td>Rear Right Button</td>
+<td><code>R4</code></td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="motion-wheel-buttons-multi-button-">Motion Wheel Buttons (Multi-Button)</h2>
+<p>The motion wheel buttons allows assigning up to 9 emulations of other buttons to a single button. This is done by holding the specified <code>WHEEL-ACTIVATION</code> button, then tilting the gamepad in one of 4 or 8 directions to trigger the button emulation. If no tilt occurs, the default assigned button <code>WHEEL-DEFAULT</code> is emulated.</p>
+<p>To set up a 4-button motion wheel buttons, do the following. In the <code>WHEEL-ACTIVATION</code> parameter, specify one of the &quot;Sony&quot; or &quot;Nintendo&quot; button values (see the &quot;Sony and Nintendo Button Mapping&quot; section), and in the other parameters, specify the &quot;Xbox&quot; values (see the &quot;Xbox Button Names&quot; section).</p>
+<pre><code class="lang-ini">[MOTION]
+<span class="hljs-attribute">WHEEL-ACTIVATION</span>=TRIANGLE
+<span class="hljs-attribute">WHEEL-DEFAULT</span>=Y
+<span class="hljs-attribute">WHEEL-UP</span>=UP
+<span class="hljs-attribute">WHEEL-LEFT</span>=LEFT
+<span class="hljs-attribute">WHEEL-RIGHT</span>=RIGHT
+<span class="hljs-attribute">WHEEL-DOWN</span>=DOWN
+
+
+
+</code></pre>
