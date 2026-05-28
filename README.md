@@ -119,6 +119,12 @@ Release 0.1
 
 //@036      - Config GUI. Умное чтение активного профиля из config.ini
 
+//@037      - Перевод на другие языки через ini
+
+//@038      - Проверяем нажатие кнопки прицеливания (поддерживаем аналоговый опрос для ZL/L2 и ZR/R2)
+
+//@039      - Always меняем на button not pressed
+
 --DSADvance.h--
 
 //@101    - _ButtonsState add Button ZL; Button ZR; 
@@ -147,8 +153,11 @@ Release 0.1
 
 //@113      - int GyroSpace = 1;
 
-//@114      - блок для педалей
+//@114      - Педали
 
 //@115      - нелинейный стик
 
+//@116      - Translation
+
+//@117      - Tightening in config
 
