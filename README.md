@@ -127,6 +127,10 @@ Release 0.1
 
 //@040      - Split Mode
 
+//@041      - Смена осей одного стика (в т.ч. для split)
+
+//@042      - доработка кнопок, invert, deadzone и пр. для secondary
+
 --DSADvance.h--
 
 //@101    - _ButtonsState add Button ZL; Button ZR; 
