@@ -125,6 +125,8 @@ Release 0.1
 
 //@039      - Always меняем на button not pressed
 
+//@040      - Split Mode
+
 --DSADvance.h--
 
 //@101    - _ButtonsState add Button ZL; Button ZR; 
@@ -160,4 +162,6 @@ Release 0.1
 //@116      - Translation
 
 //@117      - Tightening in config
+
+//@118     - Split Mode
 
