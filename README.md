@@ -131,6 +131,8 @@ Release 0.1
 
 //@042      - доработка кнопок, invert, deadzone и пр. для secondary
 
+//@043      - Accel+gyro melee gesture
+
 --DSADvance.h--
 
 //@101    - _ButtonsState add Button ZL; Button ZR; 
@@ -169,3 +171,4 @@ Release 0.1
 
 //@118     - Split Mode
 
+//@119      - Accel+gyro melee gesture
