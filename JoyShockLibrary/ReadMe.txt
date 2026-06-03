@@ -1,5 +1,5 @@
-Fork JoyShockLibrary 3.0.1
+Fork JoyShockLibrary
 https://github.com/r57zone/JoyShockLibrary
 
-Original JoyShockLibrary 3.0
+Original JoyShockLibrary
 https://github.com/JibbSmart/JoyShockLibrary/
