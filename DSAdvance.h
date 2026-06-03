@@ -145,9 +145,19 @@
 #define TOUCHPAD_LEFT_AREA				0.33
 #define TOUCHPAD_RIGHT_AREA				0.67
 
+//@115 Функция расчета линейности стика (Response Curve)
+inline float ApplyLinearity(float value, float linearity) {
+	if (linearity == 50.0f || value == 0.0f) {
+		return value; // Быстрый обход для дефолтного (линейного) значения
+	}
+	// Рассчитываем степень p (теперь при 0 степень = 4.0, при 100 степень = 0.25)
+	float p = powf(2.0f, (50.0f - linearity) / 25.0f);
+	return (value >= 0.0f ? 1.0f : -1.0f) * powf(fabsf(value), p);
+}
+
 // Aiming
 //#define FrameTime						0.0166666666666667f // 1.f / 60.f
-//#define Tightening						2.f
+//#define Tightening						2.f	//@117 in config
 
 // Mic LED status
 #define MIC_LED_ON						0x01
@@ -176,6 +186,41 @@ inline int KMProfileIndex = 0;
 inline int KMGameProfileIndex = 0;
 inline std::vector<std::string> XboxProfiles;
 inline int XboxProfileIndex = 0;
+
+enum JoystickAxis {	//@114 рабочие dinput педали
+	AXIS_X,
+	AXIS_Y,
+	AXIS_Z,
+	AXIS_R, // Z-Rotation / Rudder
+	AXIS_U, // X-Rotation / Slider 1
+	AXIS_V  // Y-Rotation / Slider 2 / Dial
+};
+
+// Функция парсинга имени оси из Config.ini в Enum при запуске программы
+inline JoystickAxis ParseAxisName(const std::string& name) {
+	std::string upper = name;
+	for (auto &c : upper) c = toupper(c);
+	if (upper == "X") return AXIS_X;
+	if (upper == "Y") return AXIS_Y;
+	if (upper == "Z") return AXIS_Z;
+	if (upper == "R" || upper == "Z-ROTATION" || upper == "ZROT" || upper == "RUDDER") return AXIS_R;
+	if (upper == "U" || upper == "X-ROTATION" || upper == "XROT" || upper == "SLIDER1") return AXIS_U;
+	if (upper == "V" || upper == "Y-ROTATION" || upper == "YROT" || upper == "SLIDER2" || upper == "DIAL") return AXIS_V;
+	return AXIS_V; // фолбэк по умолчанию
+}
+
+// Быстрый геттер значения оси по Enum внутри 250 Гц цикла
+inline DWORD GetAxisValue(const JOYINFOEX& info, JoystickAxis axis) {
+	switch (axis) {
+	case AXIS_X: return info.dwXpos;
+	case AXIS_Y: return info.dwYpos;
+	case AXIS_Z: return info.dwZpos;
+	case AXIS_R: return info.dwRpos;
+	case AXIS_U: return info.dwUpos;
+	case AXIS_V: return info.dwVpos;
+	default:     return info.dwVpos;
+	}
+}
 
 struct InputOutState {
 	unsigned char LEDRed;
@@ -266,6 +311,8 @@ struct _ButtonsState {
 	Button WheelUpRight;
 	Button WheelDownLeft;
 	Button WheelDownRight;
+
+	Button MeleeGesture; //@119
 };
 
 struct AdvancedGamepad {
@@ -330,6 +377,14 @@ struct AdvancedGamepad {
 		bool InvertLeftY = false;
 		bool InvertRightX = false;
 		bool InvertRightY = false;
+
+		float LinearityLeftX = 50.0f;	//@115
+		float LinearityLeftY = 50.0f;
+		float LinearityRightX = 50.0f;
+		float LinearityRightY = 50.0f;
+
+		bool InvertLeftXY = false;		//@119
+		bool InvertRightXY = false;
 	};
 	_Sticks Sticks;
 
@@ -379,15 +434,27 @@ struct AdvancedGamepad {
 		float EmaGyroX = 0.0f;
 		float EmaGyroY = 0.0f;
 		float EmaGyroZ = 0.0f;
-		float Tightening = 2.0f; // now in config.ini
+		float Tightening = 2.0f; //@112 now in config.ini
 
 		float MotionWheelButtonsDeadZone = 0;
 		int WheelCounter = 0;
 		bool WheelActive = false;
 		float WheelAccumX = 0;
 		float WheelAccumY = 0;
-		int WheelXboxHoldTimer = 0;		//@105 защита от пропуска нажатия Xbox кнопок в Wheel
+		int WheelXboxHoldTimer = 0;		//@105 защита от пропуска нажатия Xbox кнопок в Wheel при Sleeptimeout <15
 		WORD WheelXboxHoldButton = 0;
+		int GestureXTimer = 0;	//@119 Таймеры для Melee
+		int GestureXCooldown = 0;
+
+		float PrevAngleRad = 0.0f;	//@121
+		float CumulativeOffsetRad = 0.0f;
+		bool AngleInitialized = false;
+
+		float PitchPrevAngleRad = 0.0f;
+		float PitchCumulativeOffsetRad = 0.0f;
+		bool PitchAngleInitialized = false;
+		float LinearityWheel = 50.0f;
+		bool IsManualCalibrated = false;
 	};
 	_Motion Motion;
 
@@ -488,6 +555,9 @@ struct _AppStatus {
 	JOYINFOEX ExternalPedalsJoyInfo;
 	JOYCAPS ExternalPedalsJoyCaps;
 	int ExternalPedalsJoyIndex = JOYSTICKID1;
+	JoystickAxis Pedal1Axis = AXIS_V; //@114 Дефолтные оси для безопасности
+	JoystickAxis Pedal2Axis = AXIS_U;
+	std::string ExternalPedalsDeviceName = "AUTO"; //AUTO - фильтр, или пишем имя руля из joy.cpl в congig
 	bool LockedChangeBrightness = false;
 	bool LockChangeBrightness = true;
 	int BrightnessAreaPressed = 0;
@@ -508,7 +578,14 @@ struct _AppStatus {
 	bool AimingByPressingMode = true;		// switch MotionAimingModeOnlyPressed / MotionAimingMode
 	bool ShowFullMenu = false;		//@107 Alt+Z change Menu Layers
 	bool GyroFromLeft = false;		//@108 Gyro левша Joy-Con
-	int DeviceChangeDebounce = 0;	//@109 Таймер отложенного Refresh, fix connect/reconnsct
+	int DeviceChangeDebounce = 0;	//@109 Таймер отложенного Refresh, fix connect/reconnect
+	int GyroSpace = 1;				//@113
+	std::string LangFile = "";		//@116
+	bool SplitJoycons = false;		//@118
+	float MeleeGForce = 3.0f;		//@119 Порог перегрузки для Melee жеста в G
+	bool EmulateDS4 = false;		//@120 Режим эмуляции DualShock 4 вместо Xbox 360
+	std::string DrivingCalibrationButtonName = "NONE";	//@121
+	int DrivingCalibrationButton = 0;
 
 	struct _HotKeys
 	{
@@ -577,6 +654,8 @@ struct _CurrentXboxProfile {
 	unsigned int WheelUpRight = 0;
 	unsigned int WheelDownLeft = 0;
 	unsigned int WheelDownRight = 0;
+
+	unsigned int MeleeGesture = 0; //@119
 
 	unsigned int JCSL = 0;
 	unsigned int JCSR = 0;
@@ -1299,7 +1378,7 @@ inline double OffsetYPR(double Angle1, double Angle2) // CalcMotionStick
 	return LeftAxisX;
 }*/
 
-inline float CalcMotionStick(float gravA, float gravB, float wheelAngle, float offsetAxis) {
+/*inline float CalcMotionStick(float gravA, float gravB, float wheelAngle, float offsetAxis) {
 	float angleRadians = wheelAngle * (3.14159f / 180.0f); // To radians
 
 	float normalizedValue = OffsetYPR(atan2f(gravA, gravB), offsetAxis) / angleRadians;
@@ -1310,8 +1389,94 @@ inline float CalcMotionStick(float gravA, float gravB, float wheelAngle, float o
 		normalizedValue = -1.0f;
 
 	return normalizedValue;
-}
+}*/
 
+//@121 Математический хелпер для исключения завала осей (компенсация Pitch)
+inline float GetCompensatedAngle(float gravA, float gravB, float gravC) {
+	float signB = (gravB >= 0.0f) ? 1.0f : -1.0f;
+	float adjustedGravB = signB * sqrtf(gravB * gravB + gravC * gravC);
+	return atan2f(gravA, adjustedGravB);
+}
+//@121 Новый CalcMotionStick сблекджеком и шлюхами
+inline float CalcMotionStick(float gravA, float gravB, float gravC, float maxAngleDeg, float offsetRad, float& prevAngle, float& cumulativeOffset, bool& isInit, bool isManualCalibrated, float linearityWheel) {
+	// 1. Вычисляем текущий физический угол наклона руля в радианах [-PI, PI] с компенсацией или без
+	float currentAngleRad;
+	if (isManualCalibrated) {
+		// Прецизионный режим с компенсацией Pitch
+		currentAngleRad = GetCompensatedAngle(gravA, gravB, gravC);
+	}
+	else {
+		// Оригинальный прощающий авто-режим автора
+		currentAngleRad = atan2f(gravA, gravB);
+	}
+
+	// 2. Инициализация при первом проходе
+	if (!isInit) {
+		prevAngle = currentAngleRad;
+		cumulativeOffset = 0.0f;
+		isInit = true;
+	}
+
+	// 3. Вычисляем дельту между кадрами
+	float delta = currentAngleRad - prevAngle;
+
+	// Находим реальное физическое смещение, нормализованное в [-PI, PI]
+	float physicalDelta = delta;
+	while (physicalDelta > 3.14159265f) physicalDelta -= 6.2831853f;
+	while (physicalDelta < -3.14159265f) physicalDelta += 6.2831853f;
+
+	// 4. Фильтр шума (отсекаем нефизические прыжки от встрясок акселерометра > 45 градусов за кадр)
+	if (fabsf(physicalDelta) < 0.78539816f) { // 0.78539816 рад = 45 градусов
+		// Если движение плавное, выполняем развертывание фазы при переходе через 180°
+		if (delta < -3.14159265f) {
+			cumulativeOffset += 6.2831853f;
+		}
+		else if (delta > 3.14159265f) {
+			cumulativeOffset -= 6.2831853f;
+		}
+		prevAngle = currentAngleRad;
+	}
+
+	// Жесткий лимит на величину накопителя (Ceiling Limit)
+	if (cumulativeOffset > 6.2831853f) {
+		cumulativeOffset = 6.2831853f;
+	}
+	else if (cumulativeOffset < -6.2831853f) {
+		cumulativeOffset = -6.2831853f;
+	}
+
+	// Автоматическое «самолечение» в центре (Self-healing on Center)
+	float absDistToCenter = abs(currentAngleRad - offsetRad);
+	while (absDistToCenter > 3.14159265f) absDistToCenter -= 6.2831853f;
+	absDistToCenter = abs(absDistToCenter);
+
+	if (absDistToCenter < 0.4363323f) { // 0.4363323 рад = 25 градусов
+		cumulativeOffset = 0.0f;
+	}
+
+	// 5. Непрерывный угол с учетом всех оборотов и самолечения
+	float continuousAngle = currentAngleRad + cumulativeOffset;
+
+	// 6. Находим разницу относительно калибровки нуля
+	float diffRad = continuousAngle - offsetRad;
+
+	// 7. Переводим максимальный рабочий угол в радианы
+	float maxAngleRad = maxAngleDeg * 0.0174532925f;
+
+	if (maxAngleRad <= 0.001f) return 0.0f;
+
+	// 8. Линейно масштабируем угол в диапазон [-1.0f, 1.0f]
+	float output = diffRad / maxAngleRad;
+
+	// Применяем кривую нелинейности для руля
+	output = ApplyLinearity(output, linearityWheel);
+
+	// 9. Ограничиваем рамками аналогового стика
+	if (output > 1.0f) output = 1.0f;
+	if (output < -1.0f) output = -1.0f;
+
+	return output;
+}
 inline  void WindowToCenter() {
 	HWND hWndConsole = GetConsoleWindow();
 	//if (hWndConsole == NULL) return 1;
@@ -1328,4 +1493,113 @@ inline  void WindowToCenter() {
 	int consoleHeight = consoleRect.bottom - consoleRect.top;
 
 	MoveWindow(hWndConsole, (screenWidth - consoleWidth) / 2, (screenHeight - consoleHeight) / 2, consoleWidth, consoleHeight, TRUE);
+}
+
+//@116 For Translation
+// Нативное чтение UTF-16 LE BOM файлов через системное Windows API
+inline std::string ReadIniStringW(const std::string& section, const std::string& key, const std::string& default_val, const std::string& file_path) {
+	// 1. Преобразуем входящие std::string в std::wstring для вызова Wide-функций Windows API
+	std::wstring wSection(section.begin(), section.end());
+	std::wstring wKey(key.begin(), key.end());
+	std::wstring wDefault(default_val.begin(), default_val.end());
+	std::wstring wFile(file_path.begin(), file_path.end());
+
+	// 2. Windows API требует абсолютный путь к INI-файлу
+	wchar_t absPath[MAX_PATH];
+	GetFullPathNameW(wFile.c_str(), MAX_PATH, absPath, NULL);
+
+	// 3. Вызываем системную функцию чтения INI (она нативно и без проблем понимает UTF-16 LE BOM)
+	wchar_t buffer[2048] = { 0 };
+	GetPrivateProfileStringW(wSection.c_str(), wKey.c_str(), wDefault.c_str(), buffer, 2048, absPath);
+
+	// 4. Переводим прочитанную UTF-16 строку в UTF-8 для корректного вывода в консоль
+	int size_needed = WideCharToMultiByte(CP_UTF8, 0, buffer, -1, NULL, 0, NULL, NULL);
+	if (size_needed <= 0) return default_val;
+
+	std::string strTo(size_needed - 1, 0);
+	WideCharToMultiByte(CP_UTF8, 0, buffer, -1, &strTo[0], size_needed, NULL, NULL);
+
+	return strTo;
+}
+
+// Вспомогательная функция для замены текстовых управляющих кодов на реальные системные байты
+inline std::string ProcessEscapeSequences(std::string str) {
+	std::string result = "";
+	for (size_t i = 0; i < str.length(); ++i) {
+		if (str[i] == '\\' && i + 1 < str.length()) {
+			if (str[i + 1] == 'n') {
+				result += '\n';
+				i++;
+			}
+			else if (str[i + 1] == 't') {
+				result += '\t';
+				i++;
+			}
+			else if (str[i + 1] == '\"') {
+				result += '\"';
+				i++;
+			}
+			else if (str[i + 1] == '\\') {
+				result += '\\';
+				i++;
+			}
+			else if (i + 3 < str.length() && str[i + 1] == '0' && str[i + 2] == '3' && str[i + 3] == '3') {
+				result += '\033';
+				i += 3;
+			}
+			else {
+				result += str[i];
+			}
+		}
+		else {
+			result += str[i];
+		}
+	}
+	return result;
+}
+
+// Главная функция перевода
+inline std::string T(const std::string& key, const std::string& default_val) {
+	if (AppStatus.LangFile.empty() || AppStatus.LangFile == "english") {
+		return ProcessEscapeSequences(default_val);
+	}
+
+	std::string path = "Language\\" + AppStatus.LangFile + ".ini";
+
+	// Вызываем наше системное чтение, которое легко прочтет UTF-16 LE BOM файл
+	std::string translated = ReadIniStringW("Console", key, default_val, path);
+
+	return ProcessEscapeSequences(translated);
+}
+
+#include <vector>
+#include <stdarg.h>
+
+// Универсальный и безопасный аналог printf для вывода UTF-8 в консоль Windows
+inline void u8printf(const char* format, ...) {
+	va_list args;
+	va_start(args, format);
+
+	// 1. Форматируем строку (подставляем %s, %d и т.д.) во временный буфер
+	int size = vsnprintf(NULL, 0, format, args) + 1;
+	va_end(args);
+
+	std::vector<char> buf(size);
+	va_start(args, format);
+	vsnprintf(buf.data(), size, format, args);
+	va_end(args);
+
+	std::string utf8_str(buf.data());
+
+	// 2. Конвертируем готовую UTF-8 строку в UTF-16 для вывода
+	int wsize = MultiByteToWideChar(CP_UTF8, 0, utf8_str.c_str(), -1, NULL, 0);
+	if (wsize <= 0) return;
+
+	std::wstring wstr(wsize, 0);
+	MultiByteToWideChar(CP_UTF8, 0, utf8_str.c_str(), -1, &wstr[0], wsize);
+
+	// 3. Выводим текст напрямую в буфер консоли Windows, работает на ЛЮБЫХ версиях Windows и при ЛЮБЫХ локалях
+	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+	DWORD written;
+	WriteConsoleW(hOut, wstr.c_str(), (DWORD)wstr.length() - 1, &written, NULL);
 }
