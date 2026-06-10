@@ -139,6 +139,10 @@ Release 0.1
 
 (!) Tеперь JCAdvance в связке с gyro Driveing mode + ExternalPedals полностью заменяет все мои скрипты для FPS, TPS и racing games для Wiimote на Glovepie + ppjoy. 
 
+//@046      - gyro sens  преехал в профили
+
+//@047      - SixAxis for Joy-con. Правый стик (Y) отвечает за триггеры + hotkey
+
 --DSADvance.h--
 
 //@101    - _ButtonsState add Button ZL; Button ZR; 
@@ -182,3 +186,5 @@ Release 0.1
 //@120      - Режим эмуляции DualShock 4 вместо Xbox 360
 
 //@121      - Advanced driving mode
+
+//@122      - SixAxis for Joy-con (StickAsTrigger)
