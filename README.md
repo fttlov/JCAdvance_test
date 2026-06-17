@@ -63,7 +63,7 @@ Release 0.1
 
 //@009    - ZL ZR HOME CAPTURE биндятся в XpoxProfile
 
-//@010    - Сообщение о переносе блока Xbox Wheel в Универсальный блок Wheel для XBOX и KM, теперь он где старый блок Wheel в KM
+//@010    - Deadzone шкала от 0 до 100
 
 //@011    - Driving Mode Hotkey двухкнопочный бинд 
 
@@ -149,6 +149,9 @@ Release 0.1
 //@049      - Теперь у правого стика 3 режима: default, Stick As Trigger и Stick as buttons. Для 2 и 3 добавлены маппинги кнопок Xbox на направления стиков.
 Несмотря на большое количество лишних аппаратных кнопок (SL SR и т.д.) и виртуальных (Wheel Melee), создаётся впечатления диффицита: нужны кнопки под hotkeys,  при испоьзовании Gyro motion всегда занята одна кнопка AimingButton, ещё есть Wheel Activation.
 При Gyro motion на Joy-conп правый стик полностью свободен. Можно юзать его под кнопки. Даже в режиме as triggers ось X всё рвно свободна - минимум + 2 кнопки. 
+
+//@050      - Переработана функция калибровки. Вывод в конфиг AutoCalibrationEnabled, где 1 -always (по дефолту как раньше), 0 - автокалибровка только первый раз при старте или после RefreshDevices() затем JslSetAutomaticCalibration моментально переходит в false. <br>
+Появились проблемы с небольшим дрифтом при продолжительных (относительно) игровых сессиях. Есть подозрения на несовершенный алгоритм автокалибровки. Также добавлена ручная калибровка на хоткей клавиатуры CalibrateKey, тоже в config.
  
 --DSADvance.h--
 
@@ -197,3 +200,5 @@ Release 0.1
 //@122      - SixAxis for Joy-con (StickAsTrigger)
 
 //@123      - Stick as button
+
+//@124      - Autocalibration off + mamual calibration
