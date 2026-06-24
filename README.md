@@ -121,19 +121,24 @@
 
 //@053      - добавлен хардкод ALT + F для toggle AimingByPressingMode
 
-//@054       - исправлен snippet в части работы с множителями для gyro сенсы и, главное, теперь полноценно работает Tightening. Для joy-con с их дешманскими сенсорами крайне полезная вещь
+//@054      - исправлен snippet в части работы с множителями для gyro сенсы и, главное, теперь полноценно работает Tightening. Для joy-con с их дешманскими сенсорами крайне полезная вещь
 
 Поправлена автокалибровка для //@050.  Теперь калибруется только aiming Joy-con. Возможно, что дрифт был из-за этого. Автокалибровка по прежниму отключена (кроме первого раза)
 
+//@055      - Переработан left stick mode. Теперь это автоспринт для игр, где бег/спринт на отдельной кнопке а не на стике. Настраиваемая кнопка AutoSprintButton в профиле (вместо хардкодной LS), AutoPressStickValue сохранен. Теперь два режима работают так: 1 - кнопка активируется, если стик > AutoPressStickValue только в передней полусфере (45гр.), 2 - кнопка активируется если стик > AutoPressStickValue в любом направлении (старые игры).
+
+Все значения относящиеся к настройкам управления (AimingMode, deadzone, invert и т.д.) перенесены из config.ini в XboxProfile\*.ini.  <br>
+Удалён код KMProfiles, все функции эмуляции KB+M доступны в XboxProfiles. KMStickMode оставлен.
+
 --DSADvance.h--
 
-//@101    - _ButtonsState add Button ZL; Button ZR; 
+//@101      - _ButtonsState add Button ZL; Button ZR; 
 
-//@102    - _AppStatus add новые режимы
+//@102      - _AppStatus add новые режимы
 
-//@103    - _CurrentXboxProfile int ZL int ZR (исправлено на = 0)
+//@103      - _CurrentXboxProfile int ZL int ZR (исправлено на = 0)
 
-//@104    - Двухкнопочный парсинг
+//@104      - Двухкнопочный парсинг
 
 //@105      - WheelXboxHoldTimer
 
@@ -176,3 +181,5 @@
 //@124      - Autocalibration off + mamual calibration
 
 //@125      - Smart Sensitivity Adjustment 
+
+//@126      - AutoSprintButton
