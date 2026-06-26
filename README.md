@@ -131,6 +131,8 @@
 Все значения относящиеся к настройкам управления (AimingMode, deadzone, invert и т.д.) перенесены из config.ini в XboxProfile\*.ini.  <br>
 Удалён код KMProfiles, все функции эмуляции KB+M доступны в XboxProfiles. KMStickMode оставлен.
 
+//@056      - Все важные настройки теперь применяются безе перезапуска эмулятора.
+
 --DSADvance.h--
 
 //@101      - _ButtonsState add Button ZL; Button ZR; 
