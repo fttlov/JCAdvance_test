@@ -134,7 +134,11 @@
 
 //@057      - HotRead - Все важные настройки теперь применяются безе перезапуска эмулятора.
 
+//@058      - ещё раз чутка переписан snippet, добавлен Ratchet Delay (мс) с таймером в конфиг для режима MotionAimingMode (gyro motion - always, нажатие AimButton отключает его). При отпускании кнопки камера больше не дёргается от остаточного движения руки. 
 
+//@059      - ФОНОВЫЙ БЕСШОВНЫЙ СБРОС MinDeltaGyro (Каждые 10 минут) - попытка решить проблему поломки autocalibration со временм (30 минут и более)
+
+//@060      - 
 
 --DSADvance.h--
 
@@ -191,3 +195,8 @@
 //@126      - AutoSprintButton
 
 //@127      - Autocalibration LED debug
+
+//@128      - RatchetDelay for MotionAimingMode only
+
+//@0129     - СБРОС MinDeltaGyro
+
