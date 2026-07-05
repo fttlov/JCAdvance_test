@@ -136,7 +136,9 @@
 
 //@058      - Ratchet Delay (мс) с таймером в конфиг для режима MotionAimingMode (gyro motion - always, нажатие AimButton отключает его). При отпускании кнопки камера больше не дёргается от остаточного движения руки.  Ещё раз чутка переписан snippet 
 
-//@059      - ФОНОВЫЙ БЕСШОВНЫЙ СБРОС MinDeltaGyro (Каждые 10 минут) - попытка решить проблему поломки autocalibration со временм (30 минут и более)
+//@059      - Неактуаотно! (ФОНОВЫЙ БЕСШОВНЫЙ СБРОС MinDeltaGyro (Каждые 10 минут) - попытка решить проблему поломки autocalibration со временм (30 минут и более)) <br>
+При сбросе MinDeltaGyro "залипшая" автокалибровка восставливалась, но происходин сброс Confidence до 0 и геймпад калибровался прямо в руках. <br>
+Проблема решена за счёт добавленя функции Adaptive Noise Threshold в GamepadMotion.hpp //@402
 
 //@060      - OSD с ифной значений стиков/триггеров и гироскопа + клавиатурный hotkey
 
@@ -144,6 +146,8 @@
 С калибровкой теперь вроде всё ок, учитывая @059
 
 //@061      - fix a critical bug when Resetkey=NONE
+
+//@062      - добавлены MaxStillnessError, MinStillnessCollectionTime, MinStillnessCorrectionTime, StillnessCalibrationEaseInTime в конфиг для Joy-con
 
 --DSADvance.h-- 
 
@@ -199,10 +203,10 @@
 
 //@126      - AutoSprintButton
 
-//@127      - Autocalibration LED debug
+//@127      - (Deleted) Autocalibration LED debug
 
 //@128      - RatchetDelay for MotionAimingMode only
 
-//@0129     - СБРОС MinDeltaGyro
+//@0129     - (Deleted) СБРОС MinDeltaGyro
 
 //@130      - OSD on/off + hotkey
