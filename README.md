@@ -155,6 +155,8 @@
 
 //@063      - Accelerometer software recalibration + hotkey 
 
+//@064      - фикс неваозможности забиндить Minus Plus на LT RT путём создания 32-битного контейнера ЗАРАНЕЕ, чтобы 17-й и 18-й биты (LT/RT) не обрезались.
+
 --DSADvance.h-- 
 
 //@101      - _ButtonsState add Button ZL; Button ZR; 
