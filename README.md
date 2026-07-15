@@ -157,6 +157,8 @@
 
 //@064      - фикс невозможности забиндить Minus Plus на LT RT путём создания 32-битного контейнера ЗАРАНЕЕ, чтобы 17-й и 18-й биты (LT/RT) не обрезались.
 
+//@065      - AntiDeadZone, работает всегда для аппаратных стиков + опции для подмешивания Gyro stick  к AntiDeadZone и линейности к конечному выводу на VigemBus
+
 --DSADvance.h-- 
 
 //@101      - _ButtonsState add Button ZL; Button ZR; 
@@ -220,3 +222,5 @@
 //@130      - OSD on/off + hotkey
 
 //@131      - Accelerometer recalibration hotkey
+
+//@132      - Antideadzone and options to appiyng it and linearity to gyro
