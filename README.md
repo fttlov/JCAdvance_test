@@ -223,4 +223,4 @@
 
 //@131      - Accelerometer recalibration hotkey
 
-//@132      - Antideadzone and options to appiyng it and linearity to gyro
+//@132      - Antideadzone and options to applying it and linearity to gyro
