@@ -159,6 +159,8 @@
 
 //@065      - AntiDeadZone, работает всегда для аппаратных стиков + опции для подмешивания Gyro stick  к AntiDeadZone и линейности к конечному выводу на VigemBus
 
+//@066      - Kill any process hotkey
+
 --DSADvance.h-- 
 
 //@101      - _ButtonsState add Button ZL; Button ZR; 
