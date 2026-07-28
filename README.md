@@ -161,6 +161,8 @@
 
 //@066      - Kill any process hotkey
 
+//@067      - OSD, Linearity and EMA CPU optimization
+
 --DSADvance.h-- 
 
 //@101      - _ButtonsState add Button ZL; Button ZR; 
@@ -226,3 +228,5 @@
 //@131      - Accelerometer recalibration hotkey
 
 //@132      - Antideadzone and options to applying it and linearity to gyro
+
+//@133      - Linearity and EMA CPU optimization
