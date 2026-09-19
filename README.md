@@ -163,6 +163,8 @@
 
 //@067      - OSD, Linearity and EMA CPU optimization
 
+//@068      - Таймер тишины (3 сек), чтобы после инициализации Vigem контроллера эмулятор не реконнектил реальный геймпад. Задержки подключения не вносит
+
 --DSADvance.h-- 
 
 //@101      - _ButtonsState add Button ZL; Button ZR; 
@@ -230,3 +232,5 @@
 //@132      - Antideadzone and options to applying it and linearity to gyro
 
 //@133      - Linearity and EMA CPU optimization
+
+//@134      - Таймер тишины Vigem
