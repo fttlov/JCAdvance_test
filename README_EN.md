@@ -70,8 +70,8 @@ In "Stick as trigger" mode, you can only assign two buttons to the free X-axis (
 
 - **Universal Mapping:** Map any digital Nintendo/Sony gamepad button to emulate any XBOX button, keyboard key, or mouse action within a single profile
 - **Auto-Bind:** Quickly assign buttons using the "Bind" or select them manually from a drop-down list
-- **Dual-Action Buttons:** split physical buttons into quick tap and hold actions (Tap/Hold mechanics)
-- Dual-Action Buttons **'MUTE' Mode**: Combine an in-game action button with the 'Motion Aiming Button' (zero delay)
+- **Action Layers for Buttons:** split physical buttons into quick tap and hold actions (Tap/Hold mechanics)
+- Action Layers **'MUTE' Mode**: Combine an in-game action button with the 'Motion Aiming Button' (zero delay)
 - **Profile Manager:** Create and manage profiles within a dedicated tab in the configurator
 - **Custom Hotkeys:** Activate modes with customizable key combinations (e.g., `R + HOME`)
 - **Gyro Ratchet button:** hold down to pause (classic mode + delay option) or hold down to enable gyro movement
