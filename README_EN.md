@@ -70,6 +70,7 @@ In "Stick as trigger" mode, you can only assign two buttons to the free X-axis (
 
 - **Universal Mapping:** Map any digital Nintendo/Sony gamepad button to emulate any XBOX button, keyboard key, or mouse action within a single profile
 - **Auto-Bind:** Quickly assign buttons using the "Bind" or select them manually from a drop-down list
+- **Dual-Action Buttons:** split physical buttons into quick tap and hold actions (Tap/Hold mechanics)
 - **Profile Manager:** Create and manage profiles within a dedicated tab in the configurator
 - **Custom Hotkeys:** Activate modes with customizable key combinations (e.g., `R + HOME`)
 - **Gyro Ratchet button:** hold down to pause (classic mode + delay option) or hold down to enable gyro movement
@@ -429,6 +430,31 @@ For smooth gyro aiming, follow this core rule: **The emulator's processing frequ
   The emulator is guaranteed to pick up each fresh packet from any controller (whether a 250 Hz DualSense or a 160 Hz Mobapad) the moment it enters the OS buffer, ensuring minimal input latency.
 
 </details>
+
+### 🎮 Dual-Action Buttons (Action Layers: Regular / LongPress)
+
+#### 1. Behavior and Configuration:
+The config editor now features two button mapping layers: **`Regular`** (standard layer) and **`LongPress`** (hold action). 
+The `Regular` layer configures your default controller layout. As long as a button's `Long Press` action is set to `NONE`, it functions as a standard controller button.
+
+Assigning an action in **`Long Press`** splits the button into dual-action behavior:
+* **Quick Tap (Click):** pressing and releasing the button faster than the timeout triggers the virtual `Regular` button **upon button release**.
+* **Long Press (Hold):** holding the button longer than the timeout activates the virtual `Long Press` action.
+* **Timeout Setting:** the default hold threshold is **150 ms** (configurable via `LongPressTimeOut` in the **Settings** tab).
+
+A classic example of this mechanic is the *Dark Souls* series: quick tap to dodge/roll, hold to sprint.
+
+#### 2. MUTE Mode — A Killer Feature for Gyro Gaming:
+Gyro gaming requires a dedicated button for gyro control. To avoid sacrificing valuable controller buttons, a special option — **`MUTE`** — is available in the dropdown list, alongside `NONE` and standard buttons.
+
+**Setup Guide:**
+1. Map a button (e.g., Joy-Con `B`) in the `Regular` layer to your desired in-game action (flashlight, reload, jump).
+2. In the `Long Press` layer, set that same button to **`MUTE`**.
+3. In the **Hotkeys** tab, bind this button to **`Motion Aiming Button`**.
+
+**Result:** a quick tap cleanly performs the in-game action (flashlight), while holding the button engages gyro control **instantly (with zero delay, bypassing the 150 ms timer)** without sending any unwanted button presses to the game. You get full gyro aiming control without losing a single controller button!
+
+⚠️ **Important Note:** When a button is assigned a `Long Press` action, its standard `Regular` command can no longer be held continuously in-game — it will always trigger as a single click upon button release. This feature applies only to digital buttons.
 
 ### 🎮 Right Stick as Analog Triggers
 
