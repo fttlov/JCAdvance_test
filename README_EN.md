@@ -159,12 +159,12 @@ __________
     *   `ALT + V` — Swap Primary and Secondary gamepad slots.
     *   `ALT + I` — Display controller battery status on the screen.
     *   `ALT + F9` — Toggle dead zones diagnostics overlay.
-    *   `ALT + 1` *(or Gamepad Hotkey)* — Toggle Driving Mode On / Off **`[Configurable]`**.
-    *   `ALT + 2` *(or Gamepad Hotkey)* — Unlock / Lock Gyro Motion On / Off **`[Configurable]`**.
-    *   `ALT + A` *(or Gamepad Hotkey)* — Switch Gyro Aiming Mode (Mouse vs Stick) **`[Configurable]`**.
-    *   `ALT + D` *(or Gamepad Hotkey)* — Toggle Right Stick as Analog Triggers mode **`[Configurable]`**.
+    *   `ALT + 1` *(or Gamepad Hotkey)* — Toggle Driving Mode On / Off **`[Configurable]`**
+    *   `ALT + 2` *(or Gamepad Hotkey)* — Gyro Controls On / Off **`[Configurable]`**
+    *   `ALT + A` *(or Gamepad Hotkey)* — Switch Gyro Emulation (Mouse / Stick) **`[Configurable]`**
+    *   `ALT + D` *(or Gamepad Hotkey)* — Cycle Right Stick modes **`[Configurable]`**
+    *   `ALT + F` — Toggle Aiming Button Behavior (Hold to Pause/Hold to Aim) **`[Configurable]`**
     *   `ALT + S` — Toggle Left Stick Auto-Press Emulation mode.
-    *   `ALT + F` — Toggle Control button behavior (start/stop gyro motion)
     *   `ALT + B` — Toggle controller backlight (Sony only).
     *   `ALT + W` — Toggle Sony Touchpad click mode-switching behavior.
     *   `ALT + Up / Down` — Switch active profile.
@@ -522,9 +522,9 @@ In many games, running or sprinting is assigned to a separate button. JCAdvance 
   #### Split Mode & Joy-Con Mapping
   Added Split Mode for Joy-Cons and XY-axis swapping for horizontal grip. Joy-Con buttons (`SL`, `SR`, `HOME`, `CAPTURE`) can be mapped to a secondary virtual controller. When `SplitJoycons = 1` in `config.ini`, the Left Joy-Con acts as Player 1, and the Right acts as Player 2
 
-  #### Ratchet Delay
+  #### Button Release Delay
 
-  With classic ratcheting (hold to mute gyro motion button), the camera jerks suddenly when you release the button due to the residual movement of your hand. Default setting: 150 ms. 
+  With classic ratcheting (hold to pause Aiming Motion Button), the camera jerks suddenly when you release the button due to the residual movement of your hand. Default setting: 150 ms. <br>
   In hold to move mode, the delay does not apply
 
   #### Gyro Melee Gesture
