@@ -522,7 +522,7 @@ In many games, running or sprinting is assigned to a separate button. JCAdvance 
   #### Split Mode & Joy-Con Mapping
   Added Split Mode for Joy-Cons and XY-axis swapping for horizontal grip. Joy-Con buttons (`SL`, `SR`, `HOME`, `CAPTURE`) can be mapped to a secondary virtual controller. When `SplitJoycons = 1` in `config.ini`, the Left Joy-Con acts as Player 1, and the Right acts as Player 2
 
-  #### Button Release Delay
+  #### Gyro Activation Delay (Button Release Delay)
 
   With classic ratcheting (hold to pause Aiming Motion Button), the camera jerks suddenly when you release the button due to the residual movement of your hand. Default setting: 150 ms. <br>
   In hold to move mode, the delay does not apply
