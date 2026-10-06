@@ -1,13 +1,23 @@
 ﻿#pragma once
 
-// Library for VSCode
+// C++ Standard Library
+#include <algorithm>      // For std::transform & std::clamp
+#include <cmath>          // For math: powf, sqrtf, roundf и т.д.
 #include <mutex>
 #include <string>
 #include <thread>
+#include <unordered_map>  // For std::unordered_map (KeyNameToKeyCode)
 #include <vector>
+
+// Windows & External Libraries
 #include <windows.h>
 #include "IniReader/IniReader.h"
+
+#pragma warning(push)
+//#pragma warning(disable: 4190) // Warning C4190
 #include "JoyShockLibrary/JoyShockLibrary.h"
+#pragma warning(pop)
+
 #include "ViGEm/Client.h"
 #include "hidapi.h"
 
@@ -68,6 +78,8 @@
 #define XINPUT_GAMEPAD_RIGHT_STICK_DOWN  0x800000
 #define XINPUT_GAMEPAD_RIGHT_STICK_LEFT  0x1000000
 #define XINPUT_GAMEPAD_RIGHT_STICK_RIGHT 0x2000000
+
+#define XINPUT_GAMEPAD_EMPTY            0xFFFFFFFF //@134 Fake button, no input
 
 // Modes
 #define EmuGamepadDisabled				2
@@ -155,6 +167,14 @@ inline float ApplyLinearity(float value, float linearity) {
 	return (value >= 0.0f ? 1.0f : -1.0f) * powf(fabsf(value), p);
 }
 
+//@133 Ускоренная функция расчета линейности стика (степень p рассчитывается заранее)
+inline float ApplyLinearityFast(float value, float p_precalculated) {
+	if (p_precalculated == 1.0f || value == 0.0f) {
+		return value; // Быстрый обход для 1:1 линейности
+	}
+	return (value >= 0.0f ? 1.0f : -1.0f) * powf(fabsf(value), p_precalculated);
+}
+
 // Aiming
 //#define FrameTime						0.0166666666666667f // 1.f / 60.f
 //#define Tightening						2.f	//@117 in config
@@ -181,9 +201,9 @@ inline HANDLE hSerial;
 inline std::thread *pArduinoReadThread = NULL;
 inline float PedalsValues[2];
 
-inline std::vector<std::string> KMProfiles;
-inline int KMProfileIndex = 0;
-inline int KMGameProfileIndex = 0;
+//inline std::vector<std::string> KMProfiles;
+//inline int KMProfileIndex = 0;
+//inline int KMGameProfileIndex = 0;
 inline std::vector<std::string> XboxProfiles;
 inline int XboxProfileIndex = 0;
 
@@ -238,7 +258,16 @@ struct Button {
 	bool PressedOnce = false;
 	bool UnpressedOnce = false;
 	int KeyCode = 0;
+	int LongKeyCode = 0; //@134
 	bool IsPressed = false; // for Motion wheel
+};
+
+//@134 Выносим трекер сюда, чтобы его видели все функции!
+struct SmartButtonTracker {
+	int holdTimer = 0;       // Сколько мс кнопка удерживается
+	bool longFired = false;  // Сработал ли Long Press
+	int tapTimer = 0;        // Таймер виртуального клика при отпускании
+	Button longKbmState;     // ДОБАВЛЯЕМ: Свое собственное состояние для Long Press клавиши!
 };
 
 struct _ButtonsState {
@@ -313,6 +342,7 @@ struct _ButtonsState {
 	Button WheelDownRight;
 
 	Button MeleeGesture; //@119
+	Button AutoSprint;	//@126
 };
 
 struct AdvancedGamepad {
@@ -383,8 +413,22 @@ struct AdvancedGamepad {
 		float LinearityRightX = 50.0f;
 		float LinearityRightY = 50.0f;
 
-		bool InvertLeftXY = false;		//@119
+		//@133 Кешированные степени p:
+		float p_LeftX = 1.0f;
+		float p_LeftY = 1.0f;
+		float p_RightX = 1.0f;
+		float p_RightY = 1.0f;
+
+		float AntiDeadZoneLeftX = 0.0f;	//@132
+		float AntiDeadZoneLeftY = 0.0f;
+		float AntiDeadZoneRightX = 0.0f;
+		float AntiDeadZoneRightY = 0.0f;
+
+		bool InvertLeftXY = false;		//@118
 		bool InvertRightXY = false;
+
+		int MaxLeftStickLimit = 32767; //@zzz Ограничитель. По умолчанию стандартный максимум Xbox
+		int MaxRightStickLimit = 32767;
 	};
 	_Sticks Sticks;
 
@@ -431,10 +475,22 @@ struct AdvancedGamepad {
 		float CustomMulSens = 1.0f;
 		float MouseSmooth = 0.0f;	//@111 EMA Filter
 		float JoySmooth = 0.0f;
+		float CachedMouseAlpha = 0.0f;	//@133
+		float CachedJoyAlpha = 0.0f;
 		float EmaGyroX = 0.0f;
 		float EmaGyroY = 0.0f;
 		float EmaGyroZ = 0.0f;
 		float Tightening = 2.0f; //@112 now in config.ini
+		bool WasGyroActive = false; //@128 Gyro Activation Delay for MotionAimingMode only
+		float RatchetDelayTime = 150.0f;
+		int RatchetDelayTimer = 0;
+		int RatchetDelayMaxTimer = 0;
+		bool GyroApplyLinearity = true;	//@132
+		bool GyroApplyAntiDeadZone = false;
+		//@yyy
+		float GyroAccelThreshold = 50.0f; // Порог скорости руки (град/сек), ниже которого разгон спит (1:1)
+		float GyroAccelRate = 0.0f;  // Темп разгона (0.0 = выключено, 1.0 - 2.0 = норма)
+		float MaxGyroSensMult = 2.0f;  // Потолок чувствительности (например, максимум в 2 раза выше)
 
 		float MotionWheelButtonsDeadZone = 0;
 		int WheelCounter = 0;
@@ -455,6 +511,10 @@ struct AdvancedGamepad {
 		bool PitchAngleInitialized = false;
 		float LinearityWheel = 50.0f;
 		bool IsManualCalibrated = false;
+		float BaseSensX = 0.0f;
+		float BaseSensY = 0.0f;
+		float BaseJoySensX = 0.0f;
+		float BaseJoySensY = 0.0f;
 	};
 	_Motion Motion;
 
@@ -468,6 +528,20 @@ struct AdvancedGamepad {
 	_TouchSticks TouchSticks;
 
 	_ButtonsState ButtonsStates;
+
+	struct _SmartButtonTracker { //@134
+		int holdTimer = 0;       // Сколько мс кнопка удерживается
+		bool longFired = false;  // Сработал ли Long Press
+		int tapTimer = 0;        // Таймер виртуального клика при отпускании
+	};
+
+	struct _SmartTrackers {
+		SmartButtonTracker DPADUp, DPADDown, DPADLeft, DPADRight;
+		SmartButtonTracker A, B, X, Y;
+		SmartButtonTracker L, R, L3, R3, Back, Start;
+		SmartButtonTracker ZL, ZR;
+		SmartButtonTracker JCSL, JCSR, HOME, CAPTURE, DSEdgeL4, DSEdgeR4;
+	} Trackers;
 };
 AdvancedGamepad PrimaryGamepad;
 AdvancedGamepad SecondaryGamepad;
@@ -576,6 +650,8 @@ struct _AppStatus {
 	int AimingModeToggleButton = 0;			// Toggle Hotkey
 	std::string AimingModeToggleButtonName;// в консоль
 	bool AimingByPressingMode = true;		// switch MotionAimingModeOnlyPressed / MotionAimingMode
+	int AimingPressModeToggleButton = 0;	// hotkey для  AimingByPressingMode
+	std::string AimingPressModeToggleButtonName;
 	bool ShowFullMenu = false;		//@107 Alt+Z change Menu Layers
 	bool GyroFromLeft = false;		//@108 Gyro левша Joy-Con
 	int DeviceChangeDebounce = 0;	//@109 Таймер отложенного Refresh, fix connect/reconnect
@@ -585,12 +661,33 @@ struct _AppStatus {
 	float MeleeGForce = 3.0f;		//@119 Порог перегрузки для Melee жеста в G
 	bool EmulateDS4 = false;		//@120 Режим эмуляции DualShock 4 вместо Xbox 360
 	std::string DrivingCalibrationButtonName = "NONE";	//@121
-	int DrivingCalibrationButton = 0;
+	int DrivingCalibrationButton = 0;	
+	bool StickAsTriggerEnabled = false;		//@122
+	std::string RightStickModeButtonName = "NONE";
+	int RightStickModeButton = 0;
+	bool AutoCalibrationEnabled = true; // @124
+	bool IsManualCalibrating = false;
+	int ManualCalibrationTimer = 0;
+	int GyroCalibrateButton = 0;	//@124 gamepad calib
+	std::string GyroCalibrateButtonName;
+	bool StartupCalibrationFrozen = false;
+	int CalibRumbleTimer = 0;
+	bool BackgroundCalibSound = false;
+	bool IsOsdActive = false;	//@130
+	int LastControllersSignature = 0; //@135 Контрольная сумма реально подключенных геймпадов
+	int LongPressTimeOut = 300;	//@134
+	unsigned int JustPressedButtons = 0; // @xxxКнопки, нажатые СТРОГО в текущем кадре
+	unsigned int PrevGamepadButtons = 0; // Кнопки прошлого кадра
 
 	struct _HotKeys
 	{
 		std::string ResetKeyName;
 		int ResetKey = 0;
+		int OSDKey = 0;	//@130
+		std::string GyroCalibrateKeyName = "NONE"; // @124 keyboard calib
+		int GyroCalibrateKey = 0;
+		std::string AccelCalibrateKeyName = "NONE";		//@131
+		int AccelCalibrateKey = 0;
 	};
 	_HotKeys HotKeys;
 	bool DeadZoneMode = false;
@@ -641,6 +738,17 @@ struct _CurrentXboxProfile {
 	unsigned int RightStick = XINPUT_GAMEPAD_RIGHT_THUMB;
 	bool SwapSticksAxis = true;
 	bool SwapTriggers = true;
+
+	unsigned int AutoSprintButton = 0;	//@126
+
+	int RightStickMode = 0; //@123 Stick as button: 0 = Default, 1 = Triggers, 2 = Buttons
+	unsigned int RightStickUp = 0;
+	unsigned int RightStickDown = 0;
+	unsigned int RightStickLeft = 0;
+	unsigned int RightStickRight = 0;
+	std::vector<int> RightStickCycleModes = { 0, 1, 2 }; // Допустимые режимы для хоткея (можно менять в профиле например = 0,2)
+	int RightStickCycleIndex = 0;                        // Текущий шаг в списке
+
 	// Motion wheel
 	int WheelActivationButton = 0;
 	unsigned int WheelDefault = 0;
@@ -662,10 +770,31 @@ struct _CurrentXboxProfile {
 
 	unsigned int DSEdgeL4 = 0;
 	unsigned int DSEdgeR4 = 0;
-	unsigned int ZL = XINPUT_GAMEPAD_LEFT_TRIGGER;   //@103 по умолчанию оставляем LT (совместимость)	
-	unsigned int ZR = XINPUT_GAMEPAD_RIGHT_TRIGGER;	// пока не переназначим
+	unsigned int ZL = 0;
+	unsigned int ZR = 0;
 	unsigned int HOME = 0;		//@101 additional joy-con buttons for mapping
 	unsigned int CAPTURE = 0;
+
+	unsigned int DPADUpLong = 0;	//@134 Smart Actions for Short/Long Press buttons
+	unsigned int DPADDownLong = 0;
+	unsigned int DPADLeftLong = 0;
+	unsigned int DPADRightLong = 0;
+	unsigned int ALong = 0;
+	unsigned int BLong = 0;
+	unsigned int XLong = 0;
+	unsigned int YLong = 0;
+	unsigned int LeftBumperLong = 0;
+	unsigned int RightBumperLong = 0;
+	unsigned int LeftStickLong = 0;
+	unsigned int RightStickLong = 0;
+	unsigned int BackLong = 0;
+	unsigned int StartLong = 0;
+	unsigned int JCSLLong = 0;
+	unsigned int JCSRLong = 0;
+	unsigned int HOMELong = 0;
+	unsigned int CAPTURELong = 0;
+	unsigned int DSEdgeL4Long = 0;
+	unsigned int DSEdgeR4Long = 0;
 };
 _CurrentXboxProfile CurrentXboxProfile;
 
@@ -911,6 +1040,104 @@ inline void KeyPress(int KeyCode, bool ButtonPressed, Button* ButtonState, bool 
 	}
 }
 
+inline bool IsHotkeyTriggered(int gamepadHotkey, WORD kbdMod, WORD kbdKey) {	//@xxx
+	// 1. Проверка клавиатуры напрямую через Windows API
+	bool kbdPressed = false;
+	if (kbdKey != 0) {
+		bool modPressed = (kbdMod == 0) || ((GetAsyncKeyState(kbdMod) & 0x8000) != 0);
+		bool keyPressed = ((GetAsyncKeyState(kbdKey) & 0x8000) != 0);
+
+		if (modPressed && keyPressed) {
+			if (AppStatus.SkipPollCount == 0) {
+				kbdPressed = true;
+			}
+		}
+	}
+
+	// 2. Проверка геймпада (срабатывает строго в момент первого касания!)
+	bool gamepadPressed = false;
+	if (gamepadHotkey != 0 && AppStatus.JoyconChangeModesWithButton == 0) {
+		// Все кнопки хоткея должны быть зажаты:
+		if ((PrimaryGamepad.InputState.buttons & gamepadHotkey) == (unsigned int)gamepadHotkey) {
+			// Хотя бы одна кнопка хоткея должна быть нажата ИМЕННО В ЭТОМ КАДРЕ (фронт сигнала):
+			if ((AppStatus.JustPressedButtons & gamepadHotkey) != 0) {
+				// Защита комбо: если это одиночные CAPTURE, HOME или PS —
+				// проверяем, что НЕ зажаты другие кнопки (X, B, Y, D-Pad и т.д.):
+				bool isSingleModifier = (gamepadHotkey == JSMASK_CAPTURE || gamepadHotkey == JSMASK_HOME || gamepadHotkey == JSMASK_PS);
+				if (!isSingleModifier || (PrimaryGamepad.InputState.buttons & ~(JSMASK_CAPTURE | JSMASK_HOME | JSMASK_PS)) == 0) {
+					gamepadPressed = true;
+				}
+			}
+		}
+	}
+
+	if (kbdPressed || gamepadPressed) {
+		AppStatus.SkipPollCount = AppStatus.SkipPollTimeOut;
+		return true;
+	}
+	return false;
+}
+
+inline void ProcessSmartButton(bool isPhysicallyPressed, //@134
+	unsigned int shortXboxBind, unsigned int longXboxBind, DWORD* outXboxButtons,
+	Button* kbmButtonState, bool DontResetInputState,
+	SmartButtonTracker &tracker, int frameTimeMs, int longPressTimeoutMs)
+{
+	bool hasLongPress = (longXboxBind != 0) || (kbmButtonState != nullptr && kbmButtonState->LongKeyCode != 0);
+
+	if (!hasLongPress) {
+		if (outXboxButtons && isPhysicallyPressed) *outXboxButtons |= shortXboxBind;
+		if (kbmButtonState) KeyPress(kbmButtonState->KeyCode, DontResetInputState && isPhysicallyPressed, kbmButtonState, true);
+		return;
+	}
+
+	const int VIRTUAL_TAP_MS = 50;
+
+	if (isPhysicallyPressed) {
+		if (!tracker.longFired) {
+			tracker.holdTimer += frameTimeMs;
+			if (tracker.holdTimer >= longPressTimeoutMs) {
+				tracker.longFired = true; // Триггерим Long Press
+			}
+		}
+
+		// Шлём долгое нажатие (используем независимый tracker.longKbmState!)
+		if (tracker.longFired) {
+			if (outXboxButtons && longXboxBind != XINPUT_GAMEPAD_EMPTY) *outXboxButtons |= longXboxBind;
+			if (kbmButtonState && kbmButtonState->LongKeyCode != 0) {
+				KeyPress(kbmButtonState->LongKeyCode, DontResetInputState && true, &tracker.longKbmState, true);
+			}
+		}
+	}
+	else {
+		// Кнопку отпустили
+		if (tracker.holdTimer > 0 && !tracker.longFired) {
+			tracker.tapTimer = VIRTUAL_TAP_MS;
+		}
+
+		// Отпускаем Long Press клавишу, если она была зажата
+		if (tracker.longFired && kbmButtonState && kbmButtonState->LongKeyCode != 0) {
+			KeyPress(kbmButtonState->LongKeyCode, false, &tracker.longKbmState, true);
+		}
+
+		tracker.holdTimer = 0;
+		tracker.longFired = false;
+	}
+
+	// Шлём короткий клик (Short Press)
+	bool isVirtualTapActive = (tracker.tapTimer > 0);
+
+	if (isVirtualTapActive) {
+		if (outXboxButtons && shortXboxBind != XINPUT_GAMEPAD_EMPTY) *outXboxButtons |= shortXboxBind;
+		tracker.tapTimer -= frameTimeMs;
+	}
+
+	// Обработка короткой клавиши (использует свой собственный kbmButtonState)
+	if (kbmButtonState && kbmButtonState->KeyCode != 0) {
+		KeyPress(kbmButtonState->KeyCode, DontResetInputState && isVirtualTapActive, kbmButtonState, true);
+	}
+}
+
 inline int KeyNameToKeyCode(std::string KeyName) {
 	std::transform(KeyName.begin(), KeyName.end(), KeyName.begin(), ::toupper);
 
@@ -1091,6 +1318,7 @@ int XboxKeyNameToXboxKeyCode(std::string KeyName) {
 
 	std::unordered_map<std::string, int> KeyMap = {
 		{"NONE", 0},
+		{"MUTE", XINPUT_GAMEPAD_EMPTY},      //@134 Fake button, no input
 		{"UP", XINPUT_GAMEPAD_DPAD_UP},
 		{"DOWN", XINPUT_GAMEPAD_DPAD_DOWN},
 		{"LEFT", XINPUT_GAMEPAD_DPAD_LEFT},
@@ -1129,6 +1357,7 @@ inline int SonyNintendoKeyNameToJoyShockKeyCode(std::string KeyName) {
 
 	std::unordered_map<std::string, int> KeyMap = {
 		{"NONE", 0},
+		{"MUTE", 0xFFFFFFFF},
 		{"UP", JSMASK_UP},
 		{"DOWN", JSMASK_DOWN},
 		{"LEFT", JSMASK_LEFT},
@@ -1148,7 +1377,7 @@ inline int SonyNintendoKeyNameToJoyShockKeyCode(std::string KeyName) {
 		{"R2", JSMASK_ZR},
 		{"L4", JSMASK_FNL},
 		{"R4", JSMASK_FNR},
-		{"L", JSMASK_L},	//@110 Нет L1 R1 у joycon блять
+		{"L", JSMASK_L},	//@110 Нет L1 R1 у joycon
 		{"R", JSMASK_R},
 		{"ZL", JSMASK_ZL},
 		{"ZR", JSMASK_ZR},
@@ -1169,16 +1398,22 @@ inline int SonyNintendoKeyNameToJoyShockKeyCode(std::string KeyName) {
 	else
 		return 0;
 }*/
-	//@104 Новый парсинг для двухкнопочного биндинга аля "R1+HOME"
-	size_t plusPos = KeyName.find('+');
-	if (plusPos != std::string::npos) {
-		std::string key1 = KeyName.substr(0, plusPos);
-		std::string key2 = KeyName.substr(plusPos + 1);
+	//@104 Новый парсинг для биндингов: "R1+HOME", "B/ZL", "B\ZL", "B|ZL"
+	size_t delimPos = KeyName.find_first_of("+/\\|");
+	if (delimPos != std::string::npos) {
+		std::string key1 = KeyName.substr(0, delimPos);
+		std::string key2 = KeyName.substr(delimPos + 1);
+
+		// Удаляем случайные пробелы (если юзер написал "B / ZL")
+		key1.erase(std::remove_if(key1.begin(), key1.end(), ::isspace), key1.end());
+		key2.erase(std::remove_if(key2.begin(), key2.end(), ::isspace), key2.end());
+
 		int code1 = (KeyMap.find(key1) != KeyMap.end()) ? KeyMap[key1] : 0;
 		int code2 = (KeyMap.find(key2) != KeyMap.end()) ? KeyMap[key2] : 0;
 		return code1 | code2;
 	}
 	else {
+		KeyName.erase(std::remove_if(KeyName.begin(), KeyName.end(), ::isspace), KeyName.end());
 		if (KeyMap.find(KeyName) != KeyMap.end())
 			return KeyMap[KeyName];
 		else
@@ -1319,13 +1554,13 @@ inline unsigned int WebColorToRGB(const std::string& webColor) {
 	char buf[3] = { 0 };
 
 	buf[0] = webColor[0], buf[1] = webColor[1];
-	red = strtol(buf, NULL, 16);
+	red = static_cast<unsigned char>(strtol(buf, NULL, 16));
 
 	buf[0] = webColor[2], buf[1] = webColor[3];
-	green = strtol(buf, NULL, 16);
+	green = static_cast<unsigned char>(strtol(buf, NULL, 16));
 
 	buf[0] = webColor[4], buf[1] = webColor[5];
-	blue = strtol(buf, NULL, 16);
+	blue = static_cast<unsigned char>(strtol(buf, NULL, 16));
 
 	return (red << 16) | (green << 8) | blue;
 }
@@ -1391,13 +1626,13 @@ inline double OffsetYPR(double Angle1, double Angle2) // CalcMotionStick
 	return normalizedValue;
 }*/
 
-//@121 Математический хелпер для исключения завала осей (компенсация Pitch)
+//@121 хелпер для исключения завала осей (компенсация Pitch)
 inline float GetCompensatedAngle(float gravA, float gravB, float gravC) {
 	float signB = (gravB >= 0.0f) ? 1.0f : -1.0f;
 	float adjustedGravB = signB * sqrtf(gravB * gravB + gravC * gravC);
 	return atan2f(gravA, adjustedGravB);
 }
-//@121 Новый CalcMotionStick сблекджеком и шлюхами
+//@121 Новый CalcMotionStick с блекджеком и шлюхами
 inline float CalcMotionStick(float gravA, float gravB, float gravC, float maxAngleDeg, float offsetRad, float& prevAngle, float& cumulativeOffset, bool& isInit, bool isManualCalibrated, float linearityWheel) {
 	// 1. Вычисляем текущий физический угол наклона руля в радианах [-PI, PI] с компенсацией или без
 	float currentAngleRad;
