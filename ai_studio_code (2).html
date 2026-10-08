@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Визуализатор Gyro Stick & Mouse Curve</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #121418; color: #e1e4e8; margin: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: #1b1e24; padding: 25px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+        h2 { margin-top: 0; color: #58a6ff; font-weight: 600; }
+        .mode-switch { display: flex; gap: 10px; margin-bottom: 20px; background: #16191f; padding: 6px; border-radius: 8px; width: fit-content; }
+        .mode-btn { background: transparent; border: none; color: #8b949e; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; }
+        .mode-btn.active { background: #58a6ff; color: #fff; }
+        .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; background: #232730; padding: 15px; border-radius: 8px; }
+        .control-group { display: flex; flex-direction: column; }
+        label { font-size: 13px; font-weight: 500; margin-bottom: 5px; color: #8b949e; }
+        input[type=range] { width: 100%; accent-color: #58a6ff; }
+        .val { font-weight: bold; color: #f0f6fc; }
+        .info-panel { margin-top: 15px; padding: 12px; background: #16191f; border-left: 4px solid #58a6ff; font-size: 14px; border-radius: 4px; line-height: 1.5; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>JCAdvance: Визуализатор Gyro Acceleration</h2>
+
+    <div class="mode-switch">
+        <button class="mode-btn active" id="btnStick" onclick="setMode('stick')">Режим: Gyro Stick (Сжатие диапазона)</button>
+        <button class="mode-btn" id="btnMouse" onclick="setMode('mouse')">Режим: Gyro Mouse (Разгон курсора)</button>
+    </div>
+
+    <div class="controls">
+        <div class="control-group">
+            <label><span id="lblSensName">JoySens (База)</span>: <span class="val" id="valSens">100</span></label>
+            <input type="range" id="sens" min="40" max="250" step="5" value="100" oninput="update()">
+        </div>
+        <div class="control-group">
+            <label>GyroAccelStart (Старт эффекта, °/с): <span class="val" id="valStart">25</span></label>
+            <input type="range" id="start" min="10" max="100" step="1" value="25" oninput="update()">
+        </div>
+        <div class="control-group">
+            <label>GyroAccelEnd (Пик эффекта, °/с): <span class="val" id="valEnd">180</span></label>
+            <input type="range" id="end" min="80" max="400" step="5" value="180" oninput="update()">
+        </div>
+        <div class="control-group">
+            <label><span id="lblCapName">GyroAccelCap (Крутизна выгиба)</span>: <span class="val" id="valCap">2.5</span></label>
+            <input type="range" id="cap" min="0.5" max="5.0" step="0.1" value="2.5" oninput="update()">
+        </div>
+    </div>
+
+    <canvas id="chartCanvas" height="110"></canvas>
+
+    <div class="info-panel" id="infoPanel"></div>
+</div>
+
+<script>
+    let chart;
+    let currentMode = 'stick';
+
+    function setMode(mode) {
+        currentMode = mode;
+        document.getElementById('btnStick').classList.toggle('active', mode === 'stick');
+        document.getElementById('btnMouse').classList.toggle('active', mode === 'mouse');
+
+        if (mode === 'stick') {
+            document.getElementById('lblSensName').innerText = 'JoySens (База)';
+            document.getElementById('lblCapName').innerText = 'GyroAccelCap (Крутизна выгиба)';
+            document.getElementById('sens').value = 100;
+            document.getElementById('start').value = 25;
+            document.getElementById('end').value = 180;
+            document.getElementById('cap').value = 2.5;
+            chart.options.scales.y.max = 1.05;
+            chart.options.scales.y.title.text = 'Выход виртуального стика (0.0 — 1.0 / 32768)';
+        } else {
+            document.getElementById('lblSensName').innerText = 'MouseSens (База)';
+            document.getElementById('lblCapName').innerText = 'GyroAccelCap (Множитель ускорения, x)';
+            document.getElementById('sens').value = 180;
+            document.getElementById('start').value = 40;
+            document.getElementById('end').value = 300;
+            document.getElementById('cap').value = 2.0;
+            delete chart.options.scales.y.max;
+            chart.options.scales.y.title.text = 'Итоговая скорость курсора мыши (отн. единицы)';
+        }
+        update();
+    }
+
+    function calcPointStick(v, sens, start, end, cap) {
+        const frameTime = 0.004;
+        const baseMult = 16.66 * frameTime * (sens * 0.0025);
+        const rawMagCurrent = v * baseMult;
+        const rawMagStart = start * baseMult;
+
+        if (rawMagStart >= 1.0) return Math.min(1.0, rawMagCurrent);
+        if (v <= start) return Math.min(1.0, rawMagCurrent);
+        if (v >= end) return 1.0;
+
+        const progress = (v - start) / (end - start);
+        const curve = 1.0 - Math.pow(1.0 - progress, cap);
+        const remaining = 1.0 - rawMagStart;
+        return Math.min(1.0, rawMagStart + curve * remaining);
+    }
+
+    function calcPointMouse(v, sens, start, end, cap) {
+        const baseMultMouse = 50.0 * 0.004 * (sens * 0.005);
+        const rawSpeed = v * baseMultMouse;
+
+        if (v <= start) return rawSpeed;
+
+        const progress = Math.min(1.0, (v - start) / (end - start));
+        const mult = 1.0 + progress * (cap - 1.0);
+        return rawSpeed * mult;
+    }
+
+    function update() {
+        const sens = parseFloat(document.getElementById('sens').value);
+        const start = parseFloat(document.getElementById('start').value);
+        const end = parseFloat(document.getElementById('end').value);
+        const cap = parseFloat(document.getElementById('cap').value);
+
+        document.getElementById('valSens').innerText = sens;
+        document.getElementById('valStart').innerText = start;
+        document.getElementById('valEnd').innerText = end;
+        document.getElementById('valCap').innerText = cap;
+
+        const labels = [];
+        const rawLine = [];
+        const finalLine = [];
+
+        for (let v = 0; v <= 350; v += 5) {
+            labels.push(v);
+            if (currentMode === 'stick') {
+                const baseMult = 16.66 * 0.004 * (sens * 0.0025);
+                rawLine.push(Math.min(1.0, v * baseMult));
+                finalLine.push(calcPointStick(v, sens, start, end, cap));
+            } else {
+                const baseMultMouse = 50.0 * 0.004 * (sens * 0.005);
+                rawLine.push(v * baseMultMouse);
+                finalLine.push(calcPointMouse(v, sens, start, end, cap));
+            }
+        }
+
+        chart.data.labels = labels;
+        chart.data.datasets[0].data = rawLine;
+        chart.data.datasets[1].data = finalLine;
+        chart.data.datasets[0].label = currentMode === 'stick' ? 'Без компрессии (Удар в 32768)' : 'Без акселерации (1:1 линейно)';
+        chart.data.datasets[1].label = currentMode === 'stick' ? 'С компрессией (Soft Knee)' : 'С акселерацией (Steam Input)';
+        chart.update();
+
+        let infoText = "";
+        if (currentMode === 'stick') {
+            const naturalCap = (1.0 / (16.66 * 0.004 * (sens * 0.0025))).toFixed(1);
+            infoText = `<b>Естественный потолок:</b> ${naturalCap} °/с. Сжатие растягивает оставшийся ход стика вплоть до <b>${end} °/с</b>.`;
+        } else {
+            infoText = `До <b>${start} °/с</b> мышь идет 1:1. От ${start} до ${end} чувствительность разгоняется в <b>${cap}x</b> раз. При резких рывках камера делает полный разворот гораздо быстрее!`;
+        }
+        document.getElementById('infoPanel').innerHTML = infoText;
+    }
+
+    window.onload = function() {
+        const ctx = document.getElementById('chartCanvas').getContext('2d');
+        chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [
+                    { borderColor: '#484f58', borderDash: [5, 5], borderWidth: 2, pointRadius: 0, fill: false },
+                    { borderColor: '#58a6ff', backgroundColor: 'rgba(88, 166, 255, 0.1)', borderWidth: 3, pointRadius: 0, fill: true }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: { title: { display: true, text: 'Угловая скорость кисти (град/сек)', color: '#8b949e' }, grid: { color: '#21262d' } },
+                    y: { min: 0, grid: { color: '#21262d' } }
+                },
+                plugins: { legend: { labels: { color: '#c9d1d9' } } }
+            }
+        });
+        setMode('stick');
+    };
+</script>
+
+</body>
+</html>
