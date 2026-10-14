@@ -263,3 +263,5 @@
 //@137      - Parametric gyro acceleration for @073
 
 //@138      - Stick max output limit
+
+//@RTSS     - New direct RTSS code
