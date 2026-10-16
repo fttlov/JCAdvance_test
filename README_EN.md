@@ -445,8 +445,6 @@ A dynamic, zero-latency velocity threshold filter by Jibb Smart designed to elim
 
 </details>
 
-<details>
-  <summary><h3>Parametric Gyro Acceleration</h3></summary>
 
 <details>
     <summary><h3>Parametric Gyro Acceleration</h3></summary>
@@ -528,7 +526,7 @@ Thanks to integration over real elapsed time (`loopDeltaTime`), the total count 
 * At 500 Hz: dispatched in batches of `6.75` counts per frame.
 * At 125 Hz: dispatched in batches of `27.0` counts per frame.
 
-  </details>
+    </details>
 
 ⚠️ The graph visualizer is built on the Raw Accel principle.
 
