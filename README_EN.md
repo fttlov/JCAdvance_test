@@ -448,113 +448,141 @@ A dynamic, zero-latency velocity threshold filter by Jibb Smart designed to elim
 <details>
   <summary><h3>Parametric Gyro Acceleration</h3></summary>
 
+<details>
+    <summary><h3>Parametric Gyro Acceleration</h3></summary>
+
 #### 1. Why Acceleration is Necessary
 
-When using pure linear gyro sensitivity, players face a compromise: low sensitivity provides pixel precision on distant targets but makes quick 180° turns physically impossible due to wrist range limits. High sensitivity allows fast turning but makes fine aiming shaky.
+When using pure linear gyro mouse/stick response at low sensitivity, it is easy to track targets and hit accurately at long ranges, but difficult to turn 180° quickly because the rotational angle of the wrist and arm as a whole is physically limited. At high sensitivity, it becomes difficult to aim precisely.
 
-Parametric acceleration solves this by separating movement dynamics:
+Parametric acceleration solves this dilemma, allowing you to simultaneously achieve:
 
-* **Micro-aiming**: Slow, deliberate wrist movements remain strictly linear 1:1 for pixel-perfect tracking.
-* **Flick turns**: Faster wrist snaps cleanly accelerate to higher velocities without requiring wide arm swings.
+- High accuracy and control during slow, smooth movements (aiming, micro-adjustments)
+- Reaching sufficient speed without sweeping arm movements (quick turns, flicks)
 
 #### 2. Shared Settings Overview
 
-Both Gyro Mouse and Gyro Stick share a unified set of configuration parameters:
+The configurator uses a unified set of parameters for both gyro-mouse and gyro-stick modes:<br>
 
-* **Sens (Base Sensitivity)**: Linear 1:1 base response. **100** is the standardized baseline benchmark calibrated to a 75 °/s hand speed.
-* **GyroAccelStart**: Angular velocity threshold (°/s) below which acceleration is inactive (pure 1:1 zone).
-* **GyroAccelEnd**: Angular velocity threshold (°/s) where maximum acceleration is reached.
-* **GyroAccelCap**:
-  * **For Mouse**: Maximum sensitivity multiplier (e.g., `2.0x`).
-  * **For Stick**: Response curve shape easing the stick into full 100% deflection (32768).
+**MouseSens and JoySens (Base Sens):** Controls sensitivity at 1:1 linearity.<br>
 
----
+**GyroAccelStart:** Angular velocity threshold (°/s) after which acceleration begins. The entire zone below this threshold operates strictly linear 1:1.<br>
+
+**GyroAccelEnd:** Angular velocity threshold (°/s) at which acceleration reaches its maximum.<br>
+
+**GyroAccelCap:** <br>
+• **For Mouse:** Final sensitivity acceleration multiplier.<br>
+• **For Stick:** Curve shape along which the stick approaches maximum deflection (32768).
 
 #### 3. Gyro Mouse Mode
 
-⚠️ *Gyro mouse tracking is mathematically decoupled from emulator polling rates. The visualizer operates on the esports-standard **Gain Curve** (Sensitivity Multiplier, equivalent to Raw Accel).*
+⚠️ Gyro mouse speed is completely decoupled from the emulator polling rate.
 
-##### Acceleration Mechanics and the 75 °/s Standard
+##### Acceleration and the GyroAccelEnd = 75 °/s Standard
 
-**How it works in practice:**<br>
-Example settings: `MouseSens = 100`, `GyroAccelStart = 25`, `GyroAccelEnd = 75`, `GyroAccelCap = 2.0x`.
+**How acceleration works in practice:**<br>
 
-* Smooth aiming (hand speeds up to 25 °/s): Mouse responds linearly 1:1 at base `MouseSens`.
-* Accelerating the wrist: Between 25 and 75 °/s, sensitivity smoothly scales up, doubling at 75 °/s. Camera turns at a speed equivalent to moving your hand at **150 °/s** without acceleration ($75 \times 2.0$).
-* Snapping faster (e.g., 200 °/s): The 2.0x boost is preserved, yielding camera rotation equivalent to **400 °/s** on linear input.
+Suppose we have the following settings:
+`MouseSens = 100` <br>
+`GyroAccelStart = 25` <br>
+`GyroAccelEnd = 75` <br>
+`GyroAccelCap = 2.0`<br>
 
-**Why the 75 °/s Standard:**<br>
-Research by **Jibb Smart** (creator of JoyShockMapper) established:
+While aiming smoothly (hand speed not exceeding 25 °/s), the mouse works without acceleration (at base `MouseSens` speed).<br>
+Increasing hand movement speed: from 25 to 75 °/s, sensitivity smoothly scales up, doubling (2.0x) exactly at the 75 °/s mark. The in-game camera rotates as fast as it would at a hand speed of 150 °/s without acceleration.<br>
+Snapping faster (for example, up to 200 °/s): this 2x boost is preserved — the camera rotates with the equivalent of 400 °/s with parametric acceleration disabled.
 
-* Speeds **below 25–30 °/s** are biomechanically dedicated to **fine aiming**. Acceleration here disrupts micro-aiming.
-* Speeds **above 75 °/s** represent deliberate **turning/flicking**. The player is no longer micro-aiming, but attempting to reorient the camera quickly.
-  Hence, **75 °/s** serves as the canonical baseline where acceleration reaches its plateau.
+**Bottom line:** we maintain perfect pixel control on micro-movements, while achieving fast turns with significantly less wrist effort thanks to the `GyroAccelCap` multiplier.
+
+**Why the GyroAccelEnd = 75 °/s Standard:**
+
+Research by **Jibb Smart** (creator of JoyShockMapper and pioneer of modern gyro gaming standards) showed (generalized description):
+
+- Everything **slower than 25–30 °/s** is guaranteed **aiming**. Turning on acceleration here is undesirable, otherwise aiming accurately becomes difficult (lower or raise `MouseSens` for comfortable aiming).
+- Everything **faster than 75 °/s** is guaranteed a **turn**. The player is no longer aiming; they want to reorient the camera as fast as possible.
+
+Therefore, he suggested **75 °/s** as the canonical benchmark for `GyroAccelEnd`, though nothing prevents you from setting it to 400 °/s if desired.
 
 <details>
   <summary>📐 <b>Mouse Physics & Mathematics (for enthusiasts)</b></summary>
 
-In JCAdvance, **`MouseSens = 100`** is calibrated to human wrist biomechanics (**75 °/s**):
+In the emulator, **`MouseSens = 100`** is not an arbitrary number, but a precise reference point tied to the natural biomechanics of the human wrist (**75 °/s**):
 
-$$\text{Mouse Counts/s} = \omega \times 50 \times (\text{Sens} \times 0.009)$$
+$$\text{Mouse Counts per Second (Counts/s)} = \omega \times 50 \times (\text{Sens} \times 0.009)$$
 
-At base sensitivity `100` and angular velocity `75 °/s`:
+At base sensitivity `100` and wrist rotation at `75 °/s`:
 $$75 \times 50 \times (100 \times 0.009) = 75 \times 50 \times 0.9 = \mathbf{3375\text{ Counts/s}}$$
 
-#### 1. What does 3375 Counts mean?
+#### 1. What do these 3375 counts mean?
 
-These are raw motion units (mickeys/counts) dispatched via the Win32 API (`SendInput`).
+These are **hardware motion units (mickeys/counts)** dispatched by the emulator to the Windows system API (`SendInput`).
 
-* On the Windows Desktop: Converted into logical desktop coordinates (DIPs) via DWM.
-* Inside 3D Games: Consumed directly by the game engine and translated into yaw/pitch camera angles via in-game sensitivity sliders.
+* They are **not monitor "pixels"**: on the Windows desktop, the cursor moves in logical coordinates that factor in system display scaling (DPI).
+* Inside **3D games**, these counts are captured directly by the game engine and translated into camera rotation angles via the in-game sensitivity slider.
 
 #### 2. Polling Rate Invariance
 
-Integrated over continuous elapsed time (`loopDeltaTime`), total output (3375 counts per second) remains **mathematically invariant across all emulator polling frequencies** (125, 250, or 500 Hz):
+Thanks to integration over real elapsed time (`loopDeltaTime`), the total count output (3375 counts per second) remains **mathematically invariant across any emulator frequency** (125, 250, or 500 Hz). Only packet density changes:
 
-* At 250 Hz: 13.5 counts per frame.
-* At 500 Hz: 6.75 counts per frame.
-* At 125 Hz: 27.0 counts per frame.
+* At 250 Hz: dispatched in batches of `13.5` counts per frame.
+* At 500 Hz: dispatched in batches of `6.75` counts per frame.
+* At 125 Hz: dispatched in batches of `27.0` counts per frame.
 
-</details>
+  </details>
 
----
+⚠️ The graph visualizer is built on the Raw Accel principle.
 
-#### 4. Gyro Stick Mode (Virtual Right Stick)
+### 4. Gyro Stick Mode (Right Stick)
 
-⚠️ *Gyro stick tracking is fully decoupled from emulator polling rates.*
+⚠️ Gyro stick speed is completely decoupled from the emulator polling rate.
 
-A controller stick differs fundamentally from a mouse: it commands **camera angular velocity** (Rate Control) rather than crosshair displacement. As long as the stick is deflected, the camera rotates. Games also apply internal stick response curves and acceleration.
+A controller stick differs fundamentally from a mouse: it controls **camera rotation speed** rather than crosshair displacement. As long as the stick is deflected, the camera rotates. Furthermore, game developers typically do not make stick response linear by default — a non-linear response curve is already applied to physical stick travel. Most games also include their own internal stick acceleration settings.
 
-❕ *Recommendation: In your game settings, disable stick acceleration and maximize stick sensitivity for the cleanest gyro response.*
+❕ *Recommendation: before configuring parametric acceleration in JCAdvance, try disabling stick acceleration in the game settings, and set the in-game stick sensitivity to maximum.*
 
-##### Gyro Stick Mechanics:
+#### Gyro Stick Mechanics:
 
-**1. Hardware Limits and Saturation:**<br>
-A virtual stick has a hard hardware ceiling: deflection is bound strictly from **-32768 to +32768** (100% tilt). Base sensitivity **JoySens = 100** is calibrated so the stick reaches 32768 at **75 °/s**.<br>
-You cannot deflect a stick past 100% — this boundary is **Saturation**. The camera cannot turn faster than the game allows at 100% stick deflection.
+##### 1. Hardware Limit and Saturation
 
-**2. Wrist Biomechanics: Why 75 °/s?**<br>
-Holding a stick at 100% deflection requires continuous hand rotation. However, comfortable human wrist range of motion (ROM) is approximately **70°–80°** before the joint locks.
+A virtual stick has a hard hardware ceiling: the axis values range strictly from **-32768 to +32768** (100% physical tilt).<br>
 
-Calibrating to **75 °/s** creates an ideal anatomical balance:
+Base sensitivity **JoySens = 100** is calibrated so that the stick reaches its limit of 32768 exactly at a hand angular velocity of **75 °/s**.<br>
 
-* **Natural Sweep:** Rotating the wrist across 75° at 75 °/s provides exactly **1 second** of sustained maximum turn speed (32768) without joint strain.
-* **Threshold too high (e.g., 300 °/s):** Wrist ROM is exhausted in 0.25 seconds — the wrist hits its physical limit while the in-game camera barely starts moving.
-* **Threshold too low (e.g., 30 °/s):** The stick slams into 32768 on minor hand twitches, destroying micro-aiming.
-* ⚠️ **Why swinging at 250 °/s is useless on stick:** The stick hits its ceiling (32768) at 75 °/s. Turning faster cannot increase in-game turn speed, but exhausts your remaining wrist travel in a third of a second.
+This introduces an inevitable physical boundary known as **Saturation**:
+It is physically impossible to deflect the stick beyond 100%. In other words, you cannot turn the in-game camera using the gyro-stick faster than it turns when the physical stick is pushed completely to its maximum limit.
 
-##### Gyro Stick Parameter Guide:
+##### 2. Wrist Biomechanics: Why 75 °/s?
 
-* **JoySens (Base):** Linear response sensitivity (100 = saturation at 75 °/s).
-* **GyroAccelStart:** Hand speed below which the stick behaves strictly linear (1:1 aiming zone).
-* **GyroAccelEnd:** Hand speed (75 °/s standard) at which stick deflection reaches 100% (32768).
-* **GyroAccelCap:** In stick mode, this is **not a multiplier**, but a **curve shaping parameter**:
-  * `1.0`: Pure linear progression.
-  * `< 1.0`: Concave curve (initial response suppressed).
-  * `> 1.0`: Smooth convex curve easing into 32768.
+To keep the virtual stick held at maximum (32768), the hand must rotate continuously. However, the anatomical limit of comfortable human wrist rotation is only **70°–80°**, after which the joint hits a physical wall.
 
-*Test Preset for Halo MCC (In-game settings: Look Sensitivity 10/10, Look Acceleration 1/10):*<br>
-`JoySens = 100` | `GyroAccelStart = 1` | `GyroAccelEnd = 75` | `GyroAccelCap = 1.3 – 1.5`
+`JoySens = 100` and `GyroAccelEnd = 75 °/s` provide a balanced physiological equilibrium:
+
+- **Natural Turn:** Rotating the wrist across comfortable 75° at 75 °/s takes exactly **1 second** of holding the virtual stick at maximum. In this second, the game manages to rotate the camera to the desired angle without joint strain.  
+  *(This represents ideal conditions; in practice, to reliably hold maximum deflection (32768) for turning the camera at maximum speed, angular velocity should be slightly above 75 °/s.)*
+
+- **If the threshold is set too high (e.g., 300 °/s):** The entire wrist range of motion is burned through in 0.25 seconds — the hand has already hit its anatomical limit, while the in-game camera barely had time to move.
+
+- **If the threshold is set too low (e.g., 30 °/s):** The stick will slam into 32768 from minor hand twitches, depriving you of fine micro-adjustments.
+
+  ⚠️ **Why swinging the hand at 250 °/s is useless:** The stick already hits its ceiling (32768) at a hand speed of 75 °/s. The game technically cannot turn the camera any faster (saturation), and you exhaust your entire available wrist angle in a third of a second.
+
+#### How Acceleration Parameters Work in Practice
+
+In gyro-stick mode, acceleration does not attempt to exceed the hardware ceiling (32768), but optimizes the curve progression up to the point of saturation:
+
+- **JoySens (Base Sens):** Sensitivity at linear response (100 is the benchmark for saturation at 75 °/s).
+- **GyroAccelStart:** Hand speed below which the stick behaves strictly linear (1:1).
+- **GyroAccelEnd:** Hand speed (canonical 75 °/s) at which stick deflection reaches 100% (32768).
+- **GyroAccelCap:** An important setting for parametric acceleration in gyro-stick mode. Here it is **not a multiplier**, but the **shape of the curve** along which the stick moves toward saturation (32768):<br>
+  `1.0` — Pure linearity<br>
+  `Below 1.0` — Deceleration (suppressed initial response)<br>
+  `Above 1.0` — Acceleration (faster initial curve progression)
+
+Test preset for Halo MCC (in-game controller settings: Look Sensitivity 10/10, Look Acceleration 1/10):<br>
+`JoySens = 100`<br>
+`GyroAccelStart = 1`<br>
+`GyroAccelEnd = 75`<br>
+`GyroAccelCap = 1.3 – 1.5`
 
 </details>
 
