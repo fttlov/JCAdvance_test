@@ -312,13 +312,6 @@ Telemetry parameters for tracking thermal drift and sensor auto-calibration (see
 *Tip*: If you play for a few minutes and place the gamepad on a table, you may see Bias numbers slightly update (e.g., shifting from 1.09 to 1.02). This confirms the software calibration has detected thermal expansion and compensated for drift.<br>
 Battery percentage and live polling rate (Hz) are also displayed.
 
-### In-Game Sensitivity Tuning
-
-Adjust sensitivity in your game menu as usual. If further adjustments are needed, fine-tune gyro sensitivity during gameplay via controller hotkeys (5-unit steps). When closing the game, all sensitivity adjustments are logged in the console. Take the final numbers and save them permanently to your profile in `Config.exe`.<br>
-*Especially useful when using Gyro Stick, as games frequently apply internal stick response curves and acceleration, making calibration tricky.*
-
-❗ *Switching runtime modes refreshes the console display, which may clear previous on-screen log lines.*
-
 </details>
 
 <details>
@@ -723,6 +716,13 @@ Many games assign sprint to a button. JCAdvance can map this action to left stic
 
 <details>
   <summary><h3>Other Features & Capabilities</h3></summary>
+
+- **In-Game Sensitivity Tuning**
+
+  Adjust sensitivity in your game menu as usual. If further adjustments are needed, fine-tune gyro sensitivity during gameplay via controller hotkeys (5-unit steps). When closing the game, all sensitivity adjustments are logged in the console. Take the final numbers and save them permanently to your profile in `Config.exe`.<br>
+  *Especially useful when using Gyro Stick, as games frequently apply internal stick response curves and acceleration, making calibration tricky.*
+
+❗ *Switching runtime modes refreshes the console display, which may clear previous on-screen log lines.*
 
 - **Radial Anti-Deadzone:**<br>
   Compensates for hardcoded, unconfigurable game deadzones using an elliptical radial algorithm that preserves diagonal trajectory angles without geometric distortion.
