@@ -27,7 +27,7 @@
 
 ## Major differences in JCAdvance:
 
-- **Gyro Concept:** Separate gyro motion approaches and fine-tuning for Joy-Cons and two-handed gamepads
+- **Gyro Concept:** Separate Gyro motion approaches and fine-tuning for Joy-Cons and two-handed gamepads
 - **Enhanced auto-calibration** pipeline for Joy-Con to mitigate 'Thermal Drift' (see [technical info](#tech-info))
 - **Parametric Gyro Motion acceleration** engine with an interactive real-time graph and tooltips (see [technical info](#tech-info))
 - **Digital Trigger Bypass for Joy-Cons:** utilize all 6 virtual Xbox analog axes (4 mapped to sticks + 2 to gyro)
@@ -87,7 +87,7 @@
 </details>
 
 <details>
-  <summary><h2>About the concept of Gyro motion and 'Digital Trigger Bypass'</h2></summary>
+  <summary><h2>About the concept of Gyro Motion and 'Digital Trigger Bypass'</h2></summary>
 
 DSAdvance was originally developed as an emulator tailored for two-handed Sony controllers, with Joy-Con support added as a secondary feature.<br>
 JCAdvance not only refocuses on split Joy-Con ergonomics, but provides granular gyro sensor calibration (Gyro Space, Tightening) and introduces a definitive solution to the absence of physical analog triggers.<br>
