@@ -399,7 +399,8 @@ Launch the emulator, connect Joy-Cons, place on desk, listen for the initializat
   <summary><h3>Gyro Motion Space</h3></summary>
 
 Determines how physical controller rotation is projected into cursor, stick, or in-game camera coordinates. The original DSAdvance hardcoded this to "0", severely limiting aiming ergonomics.<br>
-JCAdvance supports all 4 standard Gyro Space modes:
+
+JCAdvance supports all 3 standard JSL Gyro Space modes:
 
 * **0 (Local Space)**: Pure gyroscope mode. Motion is calculated strictly relative to the controller chassis, ignoring gravity/accelerometer entirely.<br>
 * **1 (World Space)**: Gyroscope + accelerometer. Uses Earth gravity to decouple horizontal (yaw) and vertical (pitch) aiming regardless of controller tilt.<br>
