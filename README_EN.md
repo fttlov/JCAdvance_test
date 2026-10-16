@@ -33,7 +33,7 @@
 - **Digital Trigger Bypass for Joy-Cons:** utilize all 6 virtual Xbox analog axes (4 mapped to sticks + 2 to gyro)
 - **Fully customizable hotkeys** with multi-button chord/combo support (e.g., `R + HOME`)
 - '**Action Layers for buttons**': bind two distinct in-game actions to a single physical button (short tap vs hold)
-- '**MUTE mode**' in Action Layers: never sacrifice a physical button for Motion Aiming Control (see [technical info](#tech-info))
+- **'MUTE mode'** in Action Layers: never sacrifice a physical button for Motion Aiming Control (see [technical info](#tech-info))
 - **Real-time OSD telemetry** for sticks, triggers, gyro velocity, and calibration status (via AHK or injected directly into RTSS!)
 - Extensive core emulator and JoyShockLibrary bugfixes, stability improvements, and enhancements<br>
 - **Graphical Configurator (GUI)**! Clean, intuitive Win32 configuration tool for all settings
