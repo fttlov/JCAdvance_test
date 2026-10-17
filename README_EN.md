@@ -787,7 +787,19 @@ Many games assign sprint to a button. JCAdvance can map this action to left stic
 
 ### External Pedals
 
-Experimental feature. Connect external DirectInput pedals or steering wheels and map axes to virtual analog triggers. Supports manual device name overrides and all 8 Windows axes (default: `Z` and `Z-Rotation`).
+*This is an experimental feature; proper functioning is not guaranteed.*
+
+As far as can be understood, the original author of DSAdvance focused primarily on custom DIY pedals connected via Arduino and other prototype boards.<br>
+The code has been completely rewritten to perform genuine DirectInput device enumeration via the Windows Registry, automatically capture device names, and filter out regular gamepads (isolating only steering wheels and pedal sets). In `Config.exe`, you can now manually specify the device name (from the registry or `joy.cpl`) and reassign axes, as different manufacturers map pedals to completely different axes. All 8 standard Windows DirectInput axes are available for manual configuration. Default axes: `Z` and `Z-ROTATION`.<br>
+
+**How to connect and configure:**<br>
+1. Connect your wheel/pedals to your PC.<br>
+2. In `Config.exe` under the **Driving** tab, set **DirectInput Search** to **On**.<br>
+3. Launch `JCAdvance.exe` and check the console window. If you see a line like:  
+   `[Pedals Search] ID 0: Found device 'Your Wheel/Pedals Name' -> APPROVED!`  
+   everything is working correctly — the device was recognized and routed into the pedal slot.<br>
+4. Connect your main controller and test pedal input in `XInputTest` or Windows `joy.cpl`. If the virtual triggers do not respond to pressing the pedals, try selecting different axes for `Pedal1Axis` and `Pedal2Axis` in `Config.exe`.<br>
+5. **Troubleshooting:** If the console does not display your device name or inputs do not register at all, open `joy.cpl` (press `Win + R`, type `joy.cpl` and hit Enter), copy the exact name of your wheel/pedals as it appears in the Windows controller list, and paste it into the **Device Name** field in `Config.exe` instead of `AUTO`.
 
 ### Bugfixes & Enhancements
 
