@@ -27,10 +27,10 @@
 
 ## Major differences in JCAdvance:
 
-- **Gyro Concept:** Separate Gyro motion approaches and fine-tuning for Joy-Cons and two-handed gamepads
+- Distinct [Gyro Motion](#gyro-info) concept for Joy-Cons and classic gamepads: independent gyro settings tailored for each type
 - **Enhanced auto-calibration** pipeline for Joy-Con to mitigate 'Thermal Drift' (see [technical info](#tech-info))
 - **Parametric Gyro Motion acceleration** engine with an interactive real-time graph and tooltips (see [technical info](#tech-info))
-- **Digital Trigger Bypass for Joy-Cons:** utilize all 6 virtual Xbox analog axes (4 mapped to sticks + 2 to gyro)
+- '**Stick as Triggers**' mode: brings full analog trigger functionality to Joy-Cons, completely bypassing their digital-only limitation
 - **Fully customizable hotkeys** with multi-button chord/combo support (e.g., `R + HOME`)
 - '**Action Layers for buttons**': bind two distinct in-game actions to a single physical button (short tap vs hold)
 - **'MUTE mode'** in Action Layers: never sacrifice a physical button for Motion Aiming Control (see [technical info](#tech-info))
@@ -87,12 +87,21 @@
 </details>
 
 <details>
-  <summary><h2>About the concept of Gyro Motion and 'Digital Trigger Bypass'</h2></summary>
+  <summary><h2 id="gyro-info">Different Approaches, the Gyro Motion Concept, and 'Stick as Triggers' Mode</h2></summary>
 
 DSAdvance was originally developed as an emulator tailored for two-handed Sony controllers, with Joy-Con support added as a secondary feature.<br>
 JCAdvance not only refocuses on split Joy-Con ergonomics, but provides granular gyro sensor calibration (Gyro Space, Tightening) and introduces a definitive solution to the absence of physical analog triggers.<br>
 
-The **Gyro Motion** concept across different controller form factors:
+##### The Inherent Flaw of "Two-Handed" Gyro Gaming (DualSense / Pro Controller)
+
+When people play shooters using motion controls on a monolithic gamepad, they rarely realize how biomechanically unnatural it actually is:
+
+* **Muscle Interference (Cross-Hand Tension):** Both hands grip a single piece of plastic. Physical tension in your left hand (active strafing, dodging, jumping, or weapon swapping) inevitably travels through the controller body straight into your right hand, and vice versa.
+* **Restricted Joint Mobility:** Wrist rotation is constrained because the other hand must mirror and adapt to that angle in real time. It is impossible to execute a sharp, clean flick with just your wrist without awkwardly twisting your opposite shoulder.
+
+**With Split Joy-Cons, your hands are physically decoupled:** Your left hand with the analog stick can rest completely relaxed on the couch, while your right hand is 100% liberated in free space — only engaging your wrist and forearm. Zero parasite tension.
+
+#### The **Gyro Motion** Concept Across Controller Types and New Capabilities for Joy-Cons:
 
 * **Two-handed controllers**: Gyro Motion is primarily used for micro-adjustments and precision aiming, complementing traditional right-stick camera controls.<br>
 * **Joy-Cons:** Separated hands grant independent 6-DOF freedom. Gyroscope is used for primary camera looking and aiming in FPS/TPS games without touching the **right stick** at all.<br>
