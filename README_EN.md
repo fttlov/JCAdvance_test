@@ -89,8 +89,8 @@
 <details>
   <summary><h2 id="gyro-info">Different Approaches, the Gyro Motion Concept, and 'Stick as Triggers' Mode</h2></summary>
 
-DSAdvance was originally developed as an emulator tailored for two-handed Sony controllers, with Joy-Con support added as a secondary feature.<br>
-JCAdvance not only refocuses on split Joy-Con ergonomics, but provides granular gyro sensor calibration (Gyro Space, Tightening) and introduces a definitive solution to the absence of physical analog triggers.<br>
+*DSAdvance* was originally developed as an emulator tailored for two-handed Sony controllers, with Joy-Con support added as a secondary feature.<br>
+**JCAdvance** not only refocuses on split Joy-Con ergonomics, but provides granular gyro sensor calibration (Gyro Space, Tightening) and introduces a definitive solution to the absence of physical analog triggers.<br>
 
 ### The Inherent Flaw of "Two-Handed" Gyro Gaming (DualSense / Pro Controller)
 
