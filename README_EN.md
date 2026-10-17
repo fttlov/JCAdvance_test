@@ -163,8 +163,8 @@ Best way - using the [HidHide](https://github.com/nefarius/HidHide) utility
 __________
 
 <details open>
-  <summary><h1 id="tech-info">Technical information and instructions</h1> (expand)</summary>
-  <br>
+  <summary><h1 id="tech-info">Technical information and instructions</h1></summary>
+
 
 <details>
     <summary><h3>Interface, Settings, and Profiles</h3></summary>
