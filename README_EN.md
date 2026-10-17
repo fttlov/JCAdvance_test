@@ -92,7 +92,7 @@
 DSAdvance was originally developed as an emulator tailored for two-handed Sony controllers, with Joy-Con support added as a secondary feature.<br>
 JCAdvance not only refocuses on split Joy-Con ergonomics, but provides granular gyro sensor calibration (Gyro Space, Tightening) and introduces a definitive solution to the absence of physical analog triggers.<br>
 
-##### The Inherent Flaw of "Two-Handed" Gyro Gaming (DualSense / Pro Controller)
+### The Inherent Flaw of "Two-Handed" Gyro Gaming (DualSense / Pro Controller)
 
 When people play shooters using motion controls on a monolithic gamepad, they rarely realize how biomechanically unnatural it actually is:
 
@@ -101,7 +101,7 @@ When people play shooters using motion controls on a monolithic gamepad, they ra
 
 **With Split Joy-Cons, your hands are physically decoupled:** Your left hand with the analog stick can rest completely relaxed on the couch, while your right hand is 100% liberated in free space — only engaging your wrist and forearm. Zero parasite tension.
 
-#### The **Gyro Motion** Concept Across Controller Types and New Capabilities for Joy-Cons:
+### The **Gyro Motion** Concept Across Controller Types and New Capabilities for Joy-Cons:
 
 * **Two-handed controllers**: Gyro Motion is primarily used for micro-adjustments and precision aiming, complementing traditional right-stick camera controls.<br>
 * **Joy-Cons:** Separated hands grant independent 6-DOF freedom. Gyroscope is used for primary camera looking and aiming in FPS/TPS games without touching the **right stick** at all.<br>
