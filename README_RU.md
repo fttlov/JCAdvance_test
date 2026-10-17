@@ -155,9 +155,8 @@ Joy-con Advance - это эмулятор XBOX/DS4 геймпада с расш�
 
 __________
 
-<details>
-  <summary><h1 id="tech-info">Техническая информация и инструкции</h1> (развернуть)</summary>
-  <br>
+<details open>
+  <summary><h1 id="tech-info">Техническая информация и инструкции</h1></summary>
 
 <details>
     <summary><h3>Интерфейс, настройки и профили</h3></summary>
