@@ -685,8 +685,8 @@ Full gyro activation without losing a single gamepad button!
 The right analog stick supports three distinct operating modes:
 
 * **0 — Standard (Camera Mode)**: Traditional analog stick for camera rotation / aiming.
-* **1 — As Analog Triggers**: Vertical Y-axis smoothly controls virtual **RT** (stick up) and **LT** (stick down) across 0–255.
-* **2 — As Digital Buttons**: Turns the stick into 4 digital shortcut buttons.
+* **1 — As Analog Triggers**
+* **2 — As Digital Buttons**
 
 In `Config.exe`, the "Next Right Stick Mode" setting controls runtime hotkey cycling. You can cycle all 3 modes sequentially or configure a two-way toggle (e.g., Standard ⇄ As Buttons).
 
