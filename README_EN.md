@@ -28,13 +28,13 @@
 ## Major differences in JCAdvance:
 
 - Distinct [Gyro Motion](#gyro-info) concept for Joy-Cons and classic gamepads: independent gyro settings tailored for each type
-- **Enhanced auto-calibration** pipeline for Joy-Con to mitigate 'Thermal Drift' (see [technical info](#tech-info))
-- **Parametric Gyro Motion acceleration** engine with an interactive real-time graph and tooltips (see [technical info](#tech-info))
+- **Enhanced auto-calibration** pipeline for Joy-Con to mitigate 'Thermal Drift' (see [instructions](#calibration))
+- **Parametric Gyro Motion acceleration** engine with an interactive real-time graph and tooltips (see [instructions](#parametric))
 - '**Stick as Triggers**' mode: brings full analog trigger functionality to Joy-Cons, completely bypassing their digital-only limitation
 - **Fully customizable hotkeys** with multi-button chord/combo support (e.g., `R + HOME`)
 - '**Action Layers for buttons**': bind two distinct in-game actions to a single physical button (short tap vs hold)
-- **'MUTE mode'** in Action Layers: never sacrifice a physical button for Motion Aiming Control (see [technical info](#tech-info))
-- **Real-time OSD telemetry** for sticks, triggers, gyro velocity, and calibration status (via AHK or injected directly into RTSS!)
+- **'MUTE mode'** in Action Layers: never sacrifice a physical button for Motion Aiming Control (see [instructions](#action))
+- **Real-time OSD telemetry** for sticks, triggers, gyro velocity, and calibration status (via AHK or injected directly into RTSS!) (see [instructions](#osd))
 - Extensive core emulator and JoyShockLibrary bugfixes, stability improvements, and enhancements<br>
 - **Graphical Configurator (GUI)**! Clean, intuitive Win32 configuration tool for all settings
 
@@ -294,7 +294,7 @@ The original DSAdvance menu was overly cluttered. A modernized 3-tier menu has b
 </details>
 
 <details>
-  <summary><h3>On-Screen Display (OSD)</h3></summary>
+  <summary><h3 id="osd">On-Screen Display (OSD)</h3></summary>
 
 Displays real-time telemetry for analog sticks, triggers, gyroscope angular velocity, accelerometer noise, and device polling frequency.<br>
 
@@ -324,7 +324,7 @@ Battery percentage and live polling rate (Hz) are also displayed.
 </details>
 
 <details>
-  <summary><h3>Calibration</h3></summary>
+  <summary><h3 id="calibration">Calibration</h3></summary>
 
 ⚠️ *Hardware calibration is described for diagnostic understanding and is only needed if factory sensor tables are corrupted (hard drops, bad firmware flashes). If you have no severe issues, "if it works, don't touch it." Software calibration, however, is a routine part of daily play.*
 
@@ -456,7 +456,7 @@ A dynamic, zero-latency velocity threshold filter by Jibb Smart designed to elim
 
 
 <details>
-    <summary><h3>Parametric Gyro Acceleration</h3></summary>
+    <summary><h3 id="parametric">Parametric Gyro Acceleration</h3></summary>
 
 #### 1. Why Acceleration is Necessary
 
@@ -656,7 +656,7 @@ Rule of thumb: **Emulator processing frequency should equal or exceed physical p
 </details>
 
 <details>
-  <summary><h3>Action Layers (Regular / LongPress) + MUTE</h3></summary>
+  <summary><h3 id="action">Action Layers (Regular / LongPress) + MUTE</h3></summary>
 
 #### 1. Behavior and Setup
 
