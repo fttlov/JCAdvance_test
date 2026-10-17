@@ -418,26 +418,32 @@ JCAdvance supports all 3 standard JSL Gyro Space modes:
 
 👌 **New mode added to JoyShockLibrary:**<br>
 
-* **3 (Planar Space)**: Gyroscope + accelerometer. Projects motion onto a 2D plane, completely neutralizing wrist twist ("screwdriver" roll motion) regardless of horizontal or vertical grip. Engineered specifically for single-handed Joy-Con aiming.<br>
+* **3 (Planar Space):** Relies on the gyroscope and accelerometer. It mathematically projects movement onto a 2D plane, completely ignoring wrist-roll ("screwdriver" effect) at any grip angle, but have a limits for extreme angles; otherwise, the direction of motion reverses. <br>
+Designed specifically for the Joy-Con
 
 ⚠️ *If horizontal hand movements cause diagonal crosshair drift in modes 1, 2, or 3, your accelerometer requires calibration (see Hardware Calibration). If hardware calibration is impossible, use manual software calibration or stay on Local Space.*
 
 #### Practical Mode Guide:
 
-* **Two-handed controllers (DualSense / DS4)**: Modes 0 and 2. With the controller held at a standard 45° angle:
-  * **0**: Turn controller like a steering wheel (Roll).
-  * **2**: Turn controller like tank steering levers (Yaw).
+* **Two-handed controllers.** For standard grip:
+  * **0**: Turn controller like a steering wheel (Roll)  (gyro only mode)
+  * **2**: Turn controller like tank steering levers (Yaw) (gyro+accelerometer)
+
+If you hold the gamepad horizontally (which is uncomfortable), the "steering wheel" movement returns in mode 2. <br>
+ 
 * **Joy-Cons**: Hand movements can turn via wrist rotation or forearm sweeps. Two factors interfere with true vector tracking:
-  * a) **Roll**: Wrist twisting clockwise/counter-clockwise ("screwdriver" gesture).
-  * b) **Pitch**: Grip angle (horizontal with buttons facing screen vs vertical facing ceiling).
+  * a) **Roll**: Wrist twisting clockwise/counter-clockwise ("screwdriver" gesture)
+  * b) **Pitch**: Grip angle ('horizontal' with buttons facing screen or 'vertical' facing ceiling)
 
 *Airplane Metaphor:* Imagine the Joy-Con is an airplane: ZR is the nose, ABXY is the roof. Controls: Pitch = nose up/down, Yaw = nose left/right, Roll = twisting around the nose.
 
-* **0**: Roll > 0 skews pitch and yaw axes; requires keeping Joy-Con strictly level (gyro only).
-* **1**: Roll < 120° avoids axis skewing; Pitch > 0 causes wrist twists to influence Yaw.
-* **3**: No axis skewing, no screwdriver effect, but aim locks when Pitch > 90°.
+* **0**: Roll > 0 skews pitch and yaw axes; requires keeping Joy-Con strictly level (gyro only mode)
+* **1**: Roll < 120° avoids axis skewing; Pitch > 0 causes wrist twists (screwdriver) to influence Yaw (gyro+accelerometer)
+* **3**: No axis skewing, no screwdriver effect, but aim locks when Pitch > 90° (gyro+accelerometer)
 
-*Conclusion*: For standard horizontal grip, **Mode 3** provides the highest precision and predictability. For vertical grip, use **Mode 1**.
+*Conclusion*: For standard horizontal grip, **Mode 3** provides the highest precision and predictability. <br>
+You can see this for yourself by testing how the mouse cursor behaves in different modes. For example, try drawing an infinity symbol while tilting the gamepad at different angles.  <br>
+For vertical grip, use **Mode 1**.
 
 </details>
 
@@ -479,8 +485,8 @@ The configurator uses a unified set of parameters for both gyro-mouse and gyro-s
 **GyroAccelEnd:** Angular velocity threshold (°/s) at which acceleration reaches its maximum.<br>
 
 **GyroAccelCap:** <br>
-• **For Mouse:** Final sensitivity acceleration multiplier.<br>
-• **For Stick:** Curve shape along which the stick approaches maximum deflection (32768).
+• **For Mouse:** Final sensitivity acceleration multiplier <br>
+• **For Stick:** Curve shape along which the stick approaches maximum deflection (32768)
 
 #### 3. Gyro Mouse Mode
 
@@ -666,9 +672,9 @@ As long as `LongPress` is set to `NONE`, the button functions normally.
 
 Assigning an action to `LongPress` splits button behavior:
 
-* **Short Tap:** Virtual action triggers **on button release** if released before the threshold.
-* **Hold:** Virtual action from `LongPress` triggers once held past the threshold.
-* **Threshold:** Default threshold is **200 ms** (customizable via `LongPress Button delay` in the **Settings** tab).
+* **Short Tap:** Virtual action triggers **on button release** if released before the threshold
+* **Hold:** Virtual action from `LongPress` triggers once held past the threshold
+* **Threshold:** Default threshold is **200 ms** (customizable via `LongPress Button delay` in the **Settings** tab)
 
 *Example:* Classic *Dark Souls* controls — tap to roll, hold to sprint.
 
@@ -678,11 +684,11 @@ Gyro aiming requires an activation button. To avoid sacrificing in-game button f
 
 **Setup Workflow:**
 
-1. In `Regular`, assign a button (e.g., Joy-Con `X`) to an in-game action (e.g., Flashlight).
+1. Take any button in the Regular layer that is already used in your game (e.g., Joy-Con `X` for a flashlight or reload).
 2. In `LongPress`, set the same button to **`MUTE`**.
 3. In the **Hotkeys** tab, bind `X` as the `Motion Aiming Button`.
 
-**Result:** A quick tap triggers the in-game action (flashlight), while holding activates gyro aiming **instantly (with zero lag, bypassing the 150 ms ratchet timer)** without triggering unwanted in-game button presses.<br>
+**Result:** A quick tap triggers the in-game action (flashlight/relaod), while holding activates Gyro Aiming Button **instantly (with zero lag, bypassing the 150 ms ratchet timer)** without triggering unwanted in-game button presses.<br>
 Full gyro activation without losing a single gamepad button!
 
 > ⚠️ *Note: Assigning any action to `LongPress` removes continuous holding capability from the `Regular` action — it always executes as a single click on release.*
