@@ -768,19 +768,20 @@ Many games assign sprint to a button. JCAdvance can map this action to left stic
   * `GyroApplyAntiDeadZone`: Toggles whether anti-deadzone compensation applies to Gyro Stick.
 
 - **EMA Smoothing Filter:**<br>
-  Zero-latency exponential moving average filter. Acts like progressive inertia without traditional delay:
+  An advanced smoothing filter designed to eliminate hand tremor without introducing traditional input lag. When you move the controller, the in-game camera begins moving instantly (0 ms initial latency). Instead of delaying your input, EMA acts like simulated physical inertia or a "stretched rubber band".<br>
+  *Example (EMA = 50 / ~8 ms):* During a sudden flick, the crosshair reacts immediately, but takes approximately 8 milliseconds to smoothly reach the full tracking speed of your hand. This filters out micro-tremors and pulse twitches, giving the crosshair a slightly "heavier", remarkably stable feel. Higher values result in smoother acceleration and a longer deceleration "tail" (when physical motion ceases, the crosshair continues gliding to a halt for a split second).<br>
+  Ramp-up time to 100% velocity and decay time back to 0% (where 100% and 0% represent unfiltered raw input):<br>
+  * **Value 25:** `~2.7 ms`
+  * **Value 50:** `~8 ms`
+  * **Value 75:** `~24 ms`
 
-  * Value 25: `~2.7 ms` ramp time.
-  * Value 50: `~8 ms` ramp time.
-  * Value 75: `~24 ms` ramp time.
-
-- **Ratchet Activation Delay:** Prevents camera twitch when releasing the gyro button during ratcheting (default: 150 ms; active only in Hold to Pause mode).
+- **Gyro Activation (Ratchet release) Delay:** Prevents camera twitch when releasing the gyro button during ratcheting (default: 150 ms; active only in Hold to Pause mode).
 
 - **Melee Gyro Gesture:** Map physical punches or hammer swings to virtual buttons with adjustable G-force thresholds.
 
 - **Joy-Con Split Mode:** Horizontal individual Joy-Con grip mode with SL/SR/HOME/CAPTURE mapping. Experimental and limited due to lack of inputs.
 
-- **DualShock 4 DirectInput Emulation:** Creates a DirectInput Wireless Controller rather than XInput Xbox 360 (Nintendo controllers only) for classic PC games like *F.E.A.R.* or *Need for Speed*.
+- **DualShock 4 DirectInput Emulation:** Creates a DirectInput Wireless Controller rather than XInput Xbox 360  for classic PC games like *F.E.A.R.* or *Need for Speed*. (Nintendo controllers only)
 
 - **Reworked Driving Mode:** Overhauled `CalcMotionStick` logic preventing steering flips at extreme angles. Includes on-the-fly wheel re-centering button.
 
