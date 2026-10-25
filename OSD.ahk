@@ -21,13 +21,15 @@ Overlay.BackColor := "111111"
 Overlay.SetFont("s14 q5", "Consolas")
 
 global TxtTriggers := Overlay.Add("Text", "w370 cFF9F00",     "LT  :      0 | RT   :      0")
-global TxtLS       := Overlay.Add("Text", "w370 cFF9F00 y+5", "LS X:      0 | Y    :      0")
-global TxtRS       := Overlay.Add("Text", "w370 cFF9F00 y+5", "RS X:      0 | Y    :      0")
+;global TxtLS       := Overlay.Add("Text", "w370 cFF9F00 y+5", "LS X:      0 | LS Y :      0")
+;global TxtRS       := Overlay.Add("Text", "w370 cFF9F00 y+5", "RS X:      0 | RS Y :      0")
+global TxtLS       := Overlay.Add("Text", "w370 cFF9F00 y+5", "LS X:      0 | LS Y :      0")
+global TxtRS       := Overlay.Add("Text", "w370 cFF9F00 y+5", "RS X:      0 | RS Y :      0")
 ;global TxtVirtHz   := Overlay.Add("Text", "w370 cFF00FF y+5", "Virt Xbox:      0 Hz")
 global TxtLine1    := Overlay.Add("Text", "w370 c555555 y+5", "------------------------------")
 global TxtGyro1    := Overlay.Add("Text", "w370 c00FFFF y+5", "Calib:    0% | Steady: NO ")
 global TxtGyro2    := Overlay.Add("Text", "w370 c00FFFF y+5", "BiasX:  0.00 | BiasY:  0.00")
-global TxtVel      := Overlay.Add("Text", "w370 c00FFFF y+5", Format("Vel:    0 {1}/s | Peak:    0 {1}/s", Chr(176)))
+global TxtVel      := Overlay.Add("Text", "w370 c00FFFF y+5", Format("Gyro:  0 {1}/s | Peak:   0 {1}/s", Chr(176)))
 global TxtAccel    := Overlay.Add("Text", "w370 c00FFFF y+5", "Shake: 0.000 | MinAc: 0.000")
 global TxtLine2    := Overlay.Add("Text", "w370 c555555 y+5", "------------------------------")
 global TxtHW1      := Overlay.Add("Text", "w370 c00FF00 y+5", "Waiting for device...         ")
@@ -130,9 +132,11 @@ WatchXInput() {
         RS_X := NumGet(XINPUT_STATE, 12, "Short")
         RS_Y := NumGet(XINPUT_STATE, 14, "Short")
         
-        StrTriggers := Format("LT  : {:-6} | RT   : {:-6}", LT, RT)
-        StrLS       := Format("LS X: {:-6} | Y    : {:-6}", LS_X, LS_Y)
-        StrRS       := Format("RS X: {:-6} | Y    : {:-6}", RS_X, RS_Y)
+        StrTriggers := Format("LT  : {:-6} | RT  : {:-6}", LT, RT)
+        ;StrLS       := Format("LS X: {:-6} | LS Y : {:-6}", LS_X, LS_Y)
+        ;StrRS       := Format("RS X: {:-6} | RS Y : {:-6}", RS_X, RS_Y)
+		StrLS       := Format("LS X: {:-6} | RS X: {:-6}", LS_X, RS_X)
+        StrRS       := Format("LS Y: {:-6} | RS Y: {:-6}", LS_Y, RS_Y)
         ;StrVirtHz   := Format("Virt Xbox: {:-4} Hz [Slot {}]", currentHz, activePad)
         
         if (TxtTriggers.Value !== StrTriggers)
@@ -182,7 +186,7 @@ WatchXInput() {
         if (angVel >= peakVel) {
             peakVel := angVel
             peakTime := A_TickCount
-        } else if (A_TickCount - peakTime > 250) {
+        } else if (A_TickCount - peakTime > 500) {
             peakVel := angVel
         }
 
@@ -199,7 +203,7 @@ WatchXInput() {
         StrGyro1 := Format("Calib: {:4.0f}% | Steady: {}", conf, steady)
         StrGyro2 := Format("BiasX: {:5.2f} | BiasY: {:5.2f}", biasX, biasY)
 		
-		StrVel := Format("Vel: {2:4.0f} {1}/s | Peak: {3:4.0f} {1}/s", Chr(176), angVel, peakVel)
+		StrVel := Format("Gyro:{2:4.0f}{1}/s | Peak:{3:4.0f} {1}/s", Chr(176), angVel, peakVel)
         
         StrAccel := Format("Shake: {:5.3f} | MinAc: {:5.3f}", shake, minAc)
         
@@ -221,5 +225,7 @@ WatchXInput() {
             TxtHW1.Value := StrHW1
         if (TxtHW2.Value !== StrHW2)
             TxtHW2.Value := StrHW2
+			
+
     }
 }

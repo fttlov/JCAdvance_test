@@ -427,7 +427,7 @@ struct AdvancedGamepad {
 		bool InvertLeftXY = false;		//@118
 		bool InvertRightXY = false;
 
-		int MaxLeftStickLimit = 32767; //@zzz Ограничитель. По умолчанию стандартный максимум Xbox
+		int MaxLeftStickLimit = 32767; //@138 Ограничитель. По умолчанию стандартный максимум Xbox
 		int MaxRightStickLimit = 32767;
 	};
 	_Sticks Sticks;
@@ -487,10 +487,10 @@ struct AdvancedGamepad {
 		int RatchetDelayMaxTimer = 0;
 		bool GyroApplyLinearity = true;	//@132
 		bool GyroApplyAntiDeadZone = false;
-		//@yyy
-		float GyroAccelThreshold = 50.0f; // Порог скорости руки (град/сек), ниже которого разгон спит (1:1)
-		float GyroAccelRate = 0.0f;  // Темп разгона (0.0 = выключено, 1.0 - 2.0 = норма)
-		float MaxGyroSensMult = 2.0f;  // Потолок чувствительности (например, максимум в 2 раза выше)
+		//@137
+		float GyroAccelStart = 30.0f; // Порог скорости руки (град/сек), ниже которого разгон спит (1:1)
+		float GyroAccelEnd = 300.0f;  // Темп разгона (0.0 = выключено, 1.0 - 2.0 = норма)
+		float GyroAccelCap = 2.0f;  // Потолок чувствительности (например, максимум в 2 раза выше)
 
 		float MotionWheelButtonsDeadZone = 0;
 		int WheelCounter = 0;
@@ -654,7 +654,8 @@ struct _AppStatus {
 	std::string AimingPressModeToggleButtonName;
 	bool ShowFullMenu = false;		//@107 Alt+Z change Menu Layers
 	bool GyroFromLeft = false;		//@108 Gyro левша Joy-Con
-	int DeviceChangeDebounce = 0;	//@109 Таймер отложенного Refresh, fix connect/reconnect
+	//int DeviceChangeDebounce = 0;	//@109 Таймер отложенного Refresh, fix connect/reconnect
+	ULONGLONG DeviceChangeDeadline = 0;	//@140
 	int GyroSpace = 1;				//@113
 	std::string LangFile = "";		//@116
 	bool SplitJoycons = false;		//@118
@@ -667,16 +668,20 @@ struct _AppStatus {
 	int RightStickModeButton = 0;
 	bool AutoCalibrationEnabled = true; // @124
 	bool IsManualCalibrating = false;
-	int ManualCalibrationTimer = 0;
+	//int ManualCalibrationTimer = 0;
+	ULONGLONG ManualCalibDeadline = 0;	//@140
 	int GyroCalibrateButton = 0;	//@124 gamepad calib
 	std::string GyroCalibrateButtonName;
 	bool StartupCalibrationFrozen = false;
 	int CalibRumbleTimer = 0;
 	bool BackgroundCalibSound = false;
 	bool IsOsdActive = false;	//@130
+	int OsdType = 0; //@139 0 = AHK Desktop, 1 = RTSS Direct
+	int OsdPosX = 20;
+	int OsdPosY = 20;
 	int LastControllersSignature = 0; //@135 Контрольная сумма реально подключенных геймпадов
 	int LongPressTimeOut = 300;	//@134
-	unsigned int JustPressedButtons = 0; // @xxxКнопки, нажатые СТРОГО в текущем кадре
+	unsigned int JustPressedButtons = 0; // @136 Кнопки, нажатые СТРОГО в текущем кадре
 	unsigned int PrevGamepadButtons = 0; // Кнопки прошлого кадра
 
 	struct _HotKeys
@@ -1040,7 +1045,7 @@ inline void KeyPress(int KeyCode, bool ButtonPressed, Button* ButtonState, bool 
 	}
 }
 
-inline bool IsHotkeyTriggered(int gamepadHotkey, WORD kbdMod, WORD kbdKey) {	//@xxx
+inline bool IsHotkeyTriggered(int gamepadHotkey, WORD kbdMod, WORD kbdKey) {	//@136
 	// 1. Проверка клавиатуры напрямую через Windows API
 	bool kbdPressed = false;
 	if (kbdKey != 0) {
