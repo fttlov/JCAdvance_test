@@ -201,6 +201,8 @@
 
 //@083      -  Обновлённый Aircraft Mode. Исправлены ошибки. Yaw считается из calcmotion без изменений, это и есть drivng mode, pitch - работает инверсия, своя сенса. AircraftRollSens удалён
 
+//@084      - Linearity и Antideadzone для Триггеров (физических или stick as triggers)
+
 --DSADvance.h-- 
 
 //@101      - _ButtonsState add Button ZL; Button ZR; 
@@ -279,9 +281,10 @@
 
 //@138      - Stick max output limit
 
-//@139     - New direct RTSS code
+//@139      - New direct RTSS code
 
 //@140      - for @077
 
-//@0141     - PrevModeBeforeDriving - saving AimingMotion state for driving mode 
+//@141      - PrevModeBeforeDriving - saving AimingMotion state for driving mode 
 
+//@142      - Linearity & Antideadzone for triggers
