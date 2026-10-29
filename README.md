@@ -203,6 +203,8 @@
 
 //@084      - Linearity и Antideadzone для Триггеров (физических или stick as triggers)
 
+//@085      - Stick AntiDeadzone больше не влияет на срабатываение кнопок в режимах stick as buttons / triggers
+
 --DSADvance.h-- 
 
 //@101      - _ButtonsState add Button ZL; Button ZR; 
