@@ -203,7 +203,19 @@
 
 //@084      - Linearity и Antideadzone для Триггеров (физических или stick as triggers)
 
-//@085      - Stick AntiDeadzone больше не влияет на срабатываение кнопок в режимах stick as buttons / triggers
+//@085      - Stick AntiDeadzone больше не влияет на срабатывание кнопок в режимах stick as buttons / triggers
+
+//@086      - Оптимизация Gyro mouse (если за кадр не накопилось хотя бы 1 целого пикселя — не мучаем ОС), tightening и parametrick accel в сниппете (чтоб не делали лишних операций)
+
+//@087      - Полностью переписан код эмуляции KBM. Ликвидация легаси кода. Новый атомарный KBM-движок. Убит спам символов (одиночный тап теперь даёт ровно 1 нажатие). Независимые каналы Xbox KBM Regualar Longpress.
+Обновлены макросы, сокращены имена,Ю добавлены run-exe, kill-exe. Все работают как бинды для KBM. Исправлены Volume и PageUP/Down. Переписан KMStickMode, скроллы без задержек. Gyro Wheel тоже переписан. Работает теперь моментально.
+
+//@088      - Восстановлен и переработан Desktop.ini. Теперь это desktop mode. Включается и выключается на Home/PS + Left/Right или ALT + Left/Right. Лежит в XboxProfile но в общий цикл смены профилей не попадает. 
+Настраивается как остальные в Config.  <br>
+Особенности: зразу включает гироскоп и по зажатию работает гиро мышь. Запоминает профиль и состояние гироскопа до входа в Desktop mode и возвращает всё при выходе. <br>
+Короче говоря, вышел из игры, включил Desktop mode и геймпад - это мышка с кучей кнопок и удобных готовых макросов для управления всяким в Windows.
+
+//@089      - Профиль в OSD: в ahk и RTSS OSD в нижней строке отображается current profile
 
 --DSADvance.h-- 
 
@@ -241,7 +253,7 @@
 
 //@117      - Tightening in config
 
-//@118     - Split Mode
+//@118      - Split Mode
 
 //@119      - Accel+gyro melee gesture
 
@@ -263,7 +275,7 @@
 
 //@128      - RatchetDelay for MotionAimingMode only
 
-//@0129     - (Deleted) СБРОС MinDeltaGyro
+//@129      - (Deleted) СБРОС MinDeltaGyro
 
 //@130      - OSD on/off + hotkey
 
@@ -290,3 +302,5 @@
 //@141      - PrevModeBeforeDriving - saving AimingMotion state for driving mode 
 
 //@142      - Linearity & Antideadzone for triggers
+
+//@143      - NEW KBM Engine. Updated MousePress, KeyPress & struct Button for @087
